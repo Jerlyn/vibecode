@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerlyn vibe codes</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8F77GRJKF"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-J8F77GRJKF');
+    </script>
+    <!-- Use Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+            color: #000;
+            cursor: none; /* Hide default cursor */
+        }
+        /* Custom styles for glassmorphism nav container */
+        .glass-nav-container {
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Masonry container */
+        .masonry-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* Project cards for masonry */
+        .masonry-item {
+            position: absolute;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive column widths */
+        @media (min-width: 768px) {
+            .masonry-item {
+                width: calc(50% - 12px);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .masonry-item {
+                width: calc(33.333% - 16px);
+            }
+        }
+        
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Loading state */
+        .masonry-loading {
+            opacity: 0;
+        }
+        
+        .masonry-loaded {
+            opacity: 1;
+        }
+        
+        /* Hover effects for accessibility and UX */
+        .project-card:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:focus-within {
+            outline: 2px solid #36069A;
+            outline-offset: 4px;
+            border-radius: 8px;
+        }
+        
+        /* Skip to content for accessibility */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #36069A;
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 100;
+        }
+        
+        .skip-to-content:focus {
+            top: 6px;
+        }
+        .btn-container {
+            margin-top: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.9rem 1.8rem;
+            background-color: #89D99D; /* Using a hex color */
+            color: #1a1a1a; /* Using a hex color for dark */
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(137, 217, 157, 0.2);
+            cursor: none;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #5dcb75; /* Using a hex color */
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn svg {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(59, 140, 110, 0.3);
+            color: #f8f8f8; /* Using a hex color for light */
+        }
+
+        .btn:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .btn:hover svg {
+            transform: translateX(5px);
+        }
+
+        /* Disabled button styles */
+        .btn-disabled {
+            background-color: #5a6b6a;
+            color: rgba(237, 242, 244, 0.7);
+            cursor: not-allowed;
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+        .btn-disabled::after {
+            display: none;
+        }
+
+        /* Styles for the animated profile picture from index.html */
+        .profile-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            /* Using a variable-like color for consistency */
+            --gradient-1: #3B8C6E;
+        }
+
+        .profile-container::before {
+            content: '';
+            position: absolute;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            border: 2px dashed var(--gradient-1);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom cursor styles - improved */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            background-color: #89D99D;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s ease-out;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: normal;
+        }
+
+        .custom-cursor.link-hover {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(137, 217, 157, 0.3);
+            border: 2px solid #89D99D;
+        }
+        
+        .custom-cursor.text-hover {
+            width: 12px;
+            height: 12px;
+            background-color: #5dcb75;
+        }
+
+        /* Ensure interactive elements work properly */
+        a, button, .project-card, .profile-container {
+            cursor: none;
+        }
+
+        /* ---- NEW NAV LINK STYLES ---- */
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            font-weight: 600;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link > span {
+            display: inline-block;
+            transition: transform 0.4s ease-out;
+        }
+
+        .nav-link:hover > span,
+        .nav-link:focus > span {
+            transform: rotate(-10deg);
+        }
+
+        .nav-link::after {
+            content: attr(data-text); 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(10deg);
+            opacity: 0;
+            transition: all 0.4s ease-out;
+            color: #5dcb75;
+        }
+
+        .nav-link:hover::after,
+        .nav-link:focus::after {
+            opacity: 1;
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+
+        .nav-link:hover > span,
+        .nav-link:focus > span {
+            opacity: 0;
+            transform: translateY(-100%);
+        }
+
+        /* Adjustments for mobile touch interaction to prevent weird behavior */
+        @media (max-width: 767px) {
+            .nav-link:hover > span,
+            .nav-link:hover::after {
+                transform: none;
+                opacity: 1;
+            }
+        }
+
+        /* ---- NEW CONTACT SECTION STYLES ---- */
+        .contact-form-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+           /* background-color: #fefcf4;*/
+        }
+        @media (min-width: 768px) {
+            .contact-form-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .contact-input-group {
+            margin-bottom: 1.5rem;
+        }
+        .contact-label {
+            display: block;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+        .contact-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #f8f8f8;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+            color: #000;
+        }
+        .contact-input:focus {
+            outline: 2px solid #89D99D;
+            outline-offset: 2px;
+        }
+        .contact-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .contact-radio-label {
+            display: inline-flex;
+            align-items: center;
+            background-color: #f8f8f8;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 9999px; /* rounded-full */
+            padding: 0.5rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #000;
+            font-weight: 400;
+        }
+        .contact-radio-label:hover {
+            background-color: #e0e0e0;
+        }
+        .contact-radio-label input {
+            display: none;
+        }
+        .contact-radio-label input:checked + span {
+            background-color: #89D99D;
+            color: #1a1a1a;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            transform: scale(1.05);
+            transition: all 0.2s ease;
+        }
+        .contact-radio-label span {
+             padding: 0.5rem 1.25rem;
+             margin: -0.5rem -1.25rem;
+             border-radius: 9999px;
+        }
+        .contact-submit-btn {
+            background-color: #89D99D;
+            color: #1a1a1a;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            cursor: none;
+        }
+        .contact-submit-btn:hover {
+            background-color: #5dcb75;
+        }
+        /* Adjusted text colors for the contact section to match the portfolio theme */
+        .contact-info-text {
+            color: #1a1a1a;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Custom cursor element -->
+    <div id="custom-cursor" class="custom-cursor"></div>
+
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <!-- Header Section with Centered Glassmorphism Nav -->
+    <header class="fixed top-0 left-0 w-full z-50 p-6 flex justify-center">
+        <div class="glass-nav-container rounded-full px-6 py-3 flex items-center justify-between space-x-6 text-sm md:text-base w-full max-w-2xl">
+            <span class="font-bold text-black">Jerlyn x Vibe Code</span>
+            <div class="flex items-center space-x-6 text-black">
+                <nav class="hidden md:flex space-x-6" role="navigation" aria-label="Main navigation">
+                    <!-- Updated nav links with the new structure -->
+                    <a href="#main-content" class="nav-link focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-2 py-1" data-text="work"><span>work</span></a>
+                    <a href="#about-page" class="nav-link focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-2 py-1" data-text="about"><span>about</span></a>
+                    <a href="#contact-page" class="nav-link focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-2 py-1" data-text="contact"><span>contact</span></a>
+                </nav>
+                <button id="intro-toggle" aria-label="Toggle navigation menu" class="focus:outline-none focus:ring-2 focus:ring-gray-600 rounded p-1">
+                    <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main id="main-content" class="container mx-auto px-4 lg:px-8 pt-24" role="main">
+        <!-- The work page with true masonry layout -->
+        <section id="work-page" class="masonry-container masonry-loading" aria-label="Portfolio projects">
+            
+            <!-- Project 1 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="BadBoss.gif" alt="Animation of different bosses" class="w-full h-auto rounded-lg" loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">Are you a Bad Boss?</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        Use this tool to discover if you're a Credit Shark, Micromanager, Ghost Boss, or one of 9 other types! Then get personalized tips to become a truly great leader. <p>     
+                        <div class="btn-container pt-4">
+                            <a href="https://jerlyn.github.io/BadBoss/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Bad Boss">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                        </div>
+                    </p>
+                </div>
+            </article>
+
+            <!-- Project 2 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="polymath.png" alt="The Polymath Quiz" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">The Polymath Quiz</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        Tired of Being Told to 'Stay in Your Lane'?
+Do you feel like you don't quite fit into a single professional box? Do you see fascinating connections where others see walls? This quiz explores whether you have the traits of a polymath—a person whose expertise spans a significant number of different subject areas. <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/polymath/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Polymath Quiz">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p></p>
+                </div>
+            </article>
+
+            <!-- Project 3 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="friends.png" alt="Image of an alligator" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">First Letter Friends</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        A fun educational game for toddlers to learn animal names and their starting letters.
+                        <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/first-letter-friends/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="First Letter Friends">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>
+                    </p>
+                </div>
+            </article>
+
+            <!-- Project 4 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="Memory.png" alt="Matching ABCs" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">Memory Match</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        A kid-friendly, accessible memory matching game designed for toddlers to learn letter and number recognition. This mobile-first game focuses on educational value while providing an engaging, accessible experience.
+                        <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/memory-match-abc/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Memory Match">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>
+                    </p>
+                </div>
+            </article>
+            
+            <!-- Project 5 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="deyellow.png" alt="Image of split view of deyellowed image" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">ChatGPT DeYellower</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        Many images on social media are very apparently generated by ChatGPT. ChatGPT usually has a distinct yellow color. With this quick DeYellower, you can remove without installing anything.  <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/ChatGPTDeYellower/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="ChatGPT DeYellower">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>
+                    </p>
+                </div>
+            </article>
+            
+            <!-- Project 6 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="Pacman.png" alt="Screenshot of Pac Man" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">Pacman</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        A beautiful, colorful, and accessible version of the classic Pac-Man game built with HTML5, CSS3, and JavaScript.
+                        <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/Pacman/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Pacman">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>
+                    </p>
+                </div>
+            </article>
+            
+            <!-- Project 7 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="TicTacToe.png" alt="Tic Tac Toe screenshot" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">TicTacToe</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        A game in which two players seek in alternate turns to complete a row, a column, or a diagonal with three of their icons drawn in the spaces of a grid of nine squares.
+                    
+                        <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/TicTacToe/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="TicTacToe">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>
+                    </p>
+                </div>
+            </article>
+
+            <!-- Project 8 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="Number.png" alt="4 displayed numbers" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">Number Game</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        A simple but engaging number recognition game
+                        <p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/toddler-number-game/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Number Game">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p>  
+
+                    </p>
+                </div>
+            </article>
+            <!-- Project 9 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="Worldle.png" alt="Screenshot of Wordle" class="w-full h-auto rounded-lg" loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">Vaccine Wordle</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        Wordle inspired game with vaccine words</p>
+                    <p>     
+                        <div class="btn-container pt-4">
+                            <a href="https://jerlyn.github.io/vaccine-wordle/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Vaccine Wordle">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                        </div>
+                    </p>
+                </div>
+            </article>
+                      <!-- Project 10 -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+            <img src="tetris.png" alt="Retro Tetris screenshot" class="w-full h-auto rounded-lg" loading="lazy">
+            <div class="bg-white p-4 rounded-lg ">
+                <h3 class="font-bold text-lg">Tetris</h3>
+                <p class="text-sm mt-2 text-gray-700">
+                    A simple retro version of Tetris</p>
+                <p>     
+                    <div class="btn-container pt-4">
+                        <a href="https://jerlyn.github.io/GenAITetris/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Tetris">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                    </div>
+                </p>
+            </div>
+        </article>
+
+        </section>
+    </main>
+    <!-- The About page with image and bio -->
+    <section id="about-page" class="hidden min-h-screen px-4 py-16 md:px-8 lg:px-12 flex flex-col items-center justify-center" aria-label="About me">
+        <div class="max-w-4xl w-full flex flex-col md:flex-row items-center md:items-start gap-12 p-8">
+            <!-- Wrapped the image in the new profile-container div for the animation -->
+            <div class="w-full md:w-1/3 flex-shrink-0">
+                <div class="profile-container">
+                    <img src="me.webp" alt="A photo of Jerlyn, an Experience Design Director" class="rounded-full w-full h-auto shadow-xl aspect-square object-cover">
+                </div>
+            </div>
+            <div class="w-full md:w-2/3 space-y-6 text-center md:text-left">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">about this vibe</h2>
+                <p class="text-base text-gray-700 leading-relaxed">
+                   This is a repository of random projects that I vibe code. The purpose is to show projects I've completed in less than a day. I may or may not improve or upgraded them. It allows me to combine user experience design principles with creative development to build interactive projects that are both functional and emotionally engaging.</p>
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">about me</h2>
+                <p class="text-base text-gray-700 leading-relaxed">
+                   I'm Jerlyn, an Experience Design Director from the Commonwealth of Dominica with a passion for creating at the intersection of technology and creativity.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    As a professional member of the iAAP (I'm CPACC certified) and an Adobe Community Expert, I'm deeply committed to accessible design that works for everyone. When I'm not coding or designing, you might find me reminiscing about past ultramarathons, so I'm training, or working on my next book or illustration.
+                </p>
+                <p class="text-base text-gray-700 leading-relaxed">
+                    This portfolio showcases my experiments with generative AI, interactive experiences, and creative coding. I believe in the power of STEAM (Science, Technology, Engineering, Art, and Math) to solve problems and create meaningful and delightful experiences.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- The new contact page -->
+    <section id="contact-page" class="hidden min-h-screen px-4 py-16 md:px-8 lg:px-12 flex items-center justify-center bg-[#f8f8f8]" aria-label="Contact form and information">
+        <div class="max-w-6xl w-full p-8 rounded-lg">
+            <div class="contact-form-container">
+                <!-- Left side of the contact section -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-5xl font-bold  mb-4 font-['Inter', sans-serif]">connect with me</h2>
+                        <p class="text-base text-gray-700 font-['Inter', sans-serif]">
+                            Send me an email or fill out the form.
+                        </p>
+                    </div>
+                    <div class="w-full max-w-sm">
+                        <img src="jerlyn.gif" alt="Animation of girl floating in space" class="rounded-lg w-full h-auto object-contain">
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-bold  text-sm font-['Inter', sans-serif]">email me</h4>
+                        <a href="mailto:jerlyn@designlady.com" class=" text-lg hover:underline font-['Inter', sans-serif]">jerlyn@designlady.com</a>
+                       </div>
+                </div>
+
+                <!-- Right side - The contact form -->
+                <div>
+                    <form action="https://formspree.io/f/xqalljwn" method="POST" id="contactForm" class="space-y-6">
+                        <div class="contact-input-group">
+                            <label for="name" class="block  mb-2 font-['Inter', sans-serif]">Name</label>
+                            <input type="text" id="name" name="name" class="contact-input" placeholder="Your name" required>
+                        </div>
+                        <div class="contact-input-group">
+                            <label for="email" class="block  mb-2 font-['Inter', sans-serif]">Email</label>
+                            <input type="email" id="email" name="email" class="contact-input" placeholder="Your email address" required>
+                        </div>
+                        <div class="contact-input-group">
+                            <label class="block  mb-2 font-['Inter', sans-serif]">What's Your Project About?</label>
+                            <div class="contact-radio-group">
+                                <label class="contact-radio-label">
+                                    <input type="radio" name="projectType" value="Branding">
+                                    <span>Branding</span>
+                                </label>
+                                <label class="contact-radio-label">
+                                    <input type="radio" name="projectType" value="Website Design">
+                                    <span>Website Design</span>
+                                </label>
+                                <label class="contact-radio-label">
+                                    <input type="radio" name="projectType" value="GenAI">
+                                    <span>Generative AI</span>
+                                </label>
+                                <label class="contact-radio-label">
+                                    <input type="radio" name="projectType" value="Other">
+                                    <span>Other</span>
+                                </label>
+                            </div>
+                        </div>
+                       <!-- <div class="contact-input-group">
+                            <label for="budget" class="block  mb-2 font-['Inter', sans-serif]">Approximate Budget</label>
+                            <input type="text" id="budget" name="budget" class="contact-input" placeholder="e.g., $5k - $10k">
+                        </div>-->
+                        <div class="contact-input-group">
+                            <label for="details" class="block  mb-2 font-['Inter', sans-serif]">Share More Details</label>
+                            <textarea id="details" name="details" rows="4" class="contact-input" placeholder="Tell me more about your project..." required></textarea>
+                        </div>
+                        <div id="form-message" class="hidden p-4 rounded-lg text-sm"></div>
+                        <button type="submit" class="contact-submit-btn">SEND</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The original intro page, now hidden by default -->
+    <section id="intro-page" class="min-h-screen flex items-center justify-center text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight leading-none text-center hidden" role="navigation" aria-label="Main menu">
+        <div class="space-y-4">
+            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">work</div>
+            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">about</div>
+            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">team</div>
+            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">contact</div>
+        </div>
+    </section>
+
+
+   <!-- Footer Section -->
+   <footer class="p-6 lg:p-8 border-t border-gray-200 bg-white" role="contentinfo">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Copyright -->
+            <p class="text-sm text-gray-600 text-center md:text-left">
+                © 2025 <a href="http://www.designlady.com/">Design Lady LLC</a> | Designed & Developed by Jerlyn
+            </p>
+            
+            <!-- Social Links -->
+            <div class="flex items-center space-x-6">
+                <a href="https://github.com/Jerlyn" 
+                   class="text-gray-600 hover:text-[#36069A] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#36069A] rounded p-1" 
+                   aria-label="Visit Jerlyn's GitHub profile"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+                
+                <a href="https://linkedin.com/in/jerlyn" 
+                   class="text-gray-600 hover:text-[#36069A] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#36069A] rounded p-1" 
+                   aria-label="Visit Jerlyn's LinkedIn profile"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                
+                <a href="https://twitter.com/jerlyn" 
+                   class="text-gray-600 hover:text-[#36069A] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#36069A] rounded p-1" 
+                   aria-label="Visit Jerlyn's Twitter profile"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+    <!-- JavaScript for masonry layout and page toggling -->
+    <script>
+        // Masonry Layout Function
+        function initMasonry() {
+            const container = document.querySelector('.masonry-container');
+            const items = document.querySelectorAll('.masonry-item');
+            
+            if (!container || !items.length) return;
+            
+            // Get number of columns based on screen size
+            function getColumnCount() {
+                const width = window.innerWidth;
+                if (width >= 1024) return 3;
+                if (width >= 768) return 2;
+                return 1;
+            }
+            
+            function layoutMasonry() {
+                const columnCount = getColumnCount();
+                const columnGap = 24; // 1.5rem in pixels
+                const containerWidth = container.offsetWidth;
+                const itemWidth = (containerWidth - (columnGap * (columnCount - 1))) / columnCount;
+                
+                // Initialize column heights
+                const columnHeights = new Array(columnCount).fill(0);
+                
+                items.forEach((item, index) => {
+                    // Find the shortest column
+                    const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
+                    
+                    // Calculate position
+                    const x = shortestColumnIndex * (itemWidth + columnGap);
+                    const y = columnHeights[shortestColumnIndex];
+                    
+                    // Set item width and position
+                    item.style.width = `${itemWidth}px`;
+                    item.style.left = `${x}px`;
+                    item.style.top = `${y}px`;
+                    
+                    // Update column height
+                    columnHeights[shortestColumnIndex] += item.offsetHeight + 24; // 1.5rem gap
+                });
+                
+                // Set container height
+                const maxHeight = Math.max(...columnHeights);
+                container.style.height = `${maxHeight}px`;
+                
+                // Add loaded class for fade-in effect
+                container.classList.remove('masonry-loading');
+                container.classList.add('masonry-loaded');
+            }
+            
+            // Wait for images to load before laying out
+            function waitForImages() {
+                const images = container.querySelectorAll('img');
+                let loadedImages = 0;
+                
+                if (images.length === 0) {
+                    layoutMasonry();
+                    return;
+                }
+                
+                images.forEach(img => {
+                    if (img.complete) {
+                        loadedImages++;
+                        if (loadedImages === images.length) {
+                            layoutMasonry();
+                        }
+                    } else {
+                        img.addEventListener('load', () => {
+                            loadedImages++;
+                            if (loadedImages === images.length) {
+                                layoutMasonry();
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Initialize layout
+            waitForImages();
+            
+            // Re-layout on window resize with debouncing
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    layoutMasonry();
+                }, 250);
+            });
+        }
+        
+        // Page toggling functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const workPage = document.getElementById('work-page');
+            const aboutPage = document.getElementById('about-page');
+            const contactPage = document.getElementById('contact-page');
+            const introPage = document.getElementById('intro-page');
+            const workLink = document.querySelector('a[data-text="work"]');
+            const aboutLink = document.querySelector('a[data-text="about"]');
+            const contactLink = document.querySelector('a[data-text="contact"]');
+            const introToggle = document.getElementById('intro-toggle');
+            const contactForm = document.getElementById('contactForm');
+            const formMessage = document.getElementById('form-message');
+
+            const cursor = document.getElementById('custom-cursor');
+            
+            // Function to show a page and hide others
+            const showPage = (pageToShow) => {
+                const pages = [workPage, aboutPage, contactPage, introPage];
+                pages.forEach(page => {
+                    if (page === pageToShow) {
+                        page.classList.remove('hidden');
+                        if (page === workPage) {
+                            // Re-initialize masonry when showing work page
+                            setTimeout(() => {
+                                initMasonry();
+                            }, 100);
+                        }
+                    } else {
+                        page.classList.add('hidden');
+                    }
+                });
+            };
+
+            // Initially show the work page and initialize masonry
+            showPage(workPage);
+
+            // Event listeners for nav links
+            workLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(workPage);
+            });
+
+            aboutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(aboutPage);
+            });
+
+            contactLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage(contactPage);
+            });
+
+            // Event listener for the toggle icon
+            introToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Toggle between the two views
+                if (introPage.classList.contains('hidden')) {
+                    showPage(introPage);
+                } else {
+                    showPage(workPage);
+                }
+            });
+            
+            // Keyboard accessibility for intro page buttons
+            const introButtons = document.querySelectorAll('#intro-page [role="button"]');
+            introButtons.forEach(button => {
+                button.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (button.textContent.trim() === 'WORK') {
+                            showPage(workPage);
+                        }
+                    }
+                });
+            });
+
+            // Form submission logic
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(contactForm);
+                const data = Object.fromEntries(formData.entries());
+                
+                console.log('Form submitted with data:', data);
+
+                // Send a Google Analytics event for form submission
+                gtag('event', 'form_submit', {
+                    'event_category': 'Engagement',
+                    'event_label': 'Contact Form Submission',
+                    'project_type': formData.get('projectType') || 'Not selected'
+                });
+
+                // Use Formspree to handle the submission
+                fetch(contactForm.action, {
+                    method: contactForm.method,
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        formMessage.classList.remove('hidden', 'bg-red-200', 'text-red-800');
+                        formMessage.classList.add('bg-green-200', 'text-green-800');
+                        formMessage.textContent = 'Sit tight, I will get back to you shortly.';
+                        contactForm.reset();
+                    } else {
+                        response.json().then(data => {
+                            if (Object.hasOwn(data, 'errors')) {
+                                formMessage.textContent = data["errors"].map(error => error["message"]).join(", ");
+                            } else {
+                                formMessage.textContent = 'Oops! There was a problem submitting your form';
+                            }
+                            formMessage.classList.remove('hidden', 'bg-green-200', 'text-green-800');
+                            formMessage.classList.add('bg-red-200', 'text-red-800');
+                        });
+                    }
+                }).catch(error => {
+                    formMessage.textContent = 'Oops! There was a problem submitting your form';
+                    formMessage.classList.remove('hidden', 'bg-green-200', 'text-green-800');
+                    formMessage.classList.add('bg-red-200', 'text-red-800');
+                });
+                
+                // Hide message after a few seconds
+                setTimeout(() => {
+                    formMessage.classList.add('hidden');
+                }, 5000);
+            });
+
+            // Add event listeners for project clicks
+            const projectLinks = document.querySelectorAll('.project-card .btn');
+            projectLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const projectName = link.getAttribute('data-project-name');
+                    if (projectName) {
+                        // Send a Google Analytics event
+                        gtag('event', 'project_click', {
+                            'event_category': 'Project Interaction',
+                            'event_label': `Clicked on ${projectName}`,
+                            'value': projectName
+                        });
+                    }
+                });
+            });
+
+            // Improved custom cursor logic similar to Example.html
+            if (cursor) {
+                // Track cursor position smoothly
+                document.addEventListener('mousemove', (e) => {
+                    requestAnimationFrame(() => {
+                        cursor.style.left = e.clientX + 'px';
+                        cursor.style.top = e.clientY + 'px';
+                    });
+                });
+
+                // Handle interactive elements (links, buttons, cards)
+                const interactiveElements = document.querySelectorAll('a, button, .btn, .project-card, .profile-container, [role="button"]');
+                interactiveElements.forEach(element => {
+                    element.addEventListener('mouseenter', () => {
+                        cursor.classList.add('link-hover');
+                        cursor.classList.remove('text-hover');
+                    });
+                    element.addEventListener('mouseleave', () => {
+                        cursor.classList.remove('link-hover');
+                    });
+                });
+                
+                // Handle text elements
+                const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span:not(.btn *, button *)');
+                textElements.forEach(element => {
+                    element.addEventListener('mouseenter', () => {
+                        if (!cursor.classList.contains('link-hover')) {
+                            cursor.classList.add('text-hover');
+                        }
+                    });
+                    element.addEventListener('mouseleave', () => {
+                        cursor.classList.remove('text-hover');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
