@@ -661,7 +661,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
     <section id="intro-page" class="min-h-screen flex items-center justify-center text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight leading-none text-center hidden" role="navigation" aria-label="Main menu">
         <div class="space-y-4">
             <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">work</div>
-            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">about</div>
+            <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button"><a href="#about-page">about</a></div>
             <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">team</div>
             <div class="hover:underline cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 rounded px-4 py-2" tabindex="0" role="button">contact</div>
         </div>
@@ -871,11 +871,48 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
             // Keyboard accessibility for intro page buttons
             const introButtons = document.querySelectorAll('#intro-page [role="button"]');
             introButtons.forEach(button => {
+                // Handle clicks
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const buttonText = button.textContent.trim().toLowerCase();
+                    
+                    switch(buttonText) {
+                        case 'work':
+                            showPage(workPage);
+                            break;
+                        case 'about':
+                            showPage(aboutPage);
+                            break;
+                        case 'contact':
+                            showPage(contactPage);
+                            break;
+                        case 'team':
+                            // Navigate to about page for now, or you can specify a different destination
+                            showPage(aboutPage);
+                            break;
+                    }
+                });
+
+                // Handle keyboard navigation
                 button.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        if (button.textContent.trim() === 'WORK') {
-                            showPage(workPage);
+                        const buttonText = button.textContent.trim().toLowerCase();
+                        
+                        switch(buttonText) {
+                            case 'work':
+                                showPage(workPage);
+                                break;
+                            case 'about':
+                                showPage(aboutPage);
+                                break;
+                            case 'contact':
+                                showPage(contactPage);
+                                break;
+                            case 'team':
+                                // Navigate to about page for now, or you can specify a different destination
+                                showPage(aboutPage);
+                                break;
                         }
                     }
                 });
