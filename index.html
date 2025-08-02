@@ -22,7 +22,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f8f8;
-            color: #000;
+            color: #2D6DC4;
             cursor: none; /* Hide default cursor */
         }
         /* Custom styles for glassmorphism nav container */
@@ -83,7 +83,7 @@
         }
         
         .project-card:focus-within {
-            outline: 2px solid #36069A;
+            outline: 2px solid #2D6DC4;
             outline-offset: 4px;
             border-radius: 8px;
         }
@@ -93,7 +93,7 @@
             position: absolute;
             top: -40px;
             left: 6px;
-            background: #36069A;
+            background: #2D6DC4;
             color: white;
             padding: 8px;
             text-decoration: none;
@@ -112,8 +112,8 @@
             display: inline-flex;
             align-items: center;
             padding: 0.9rem 1.8rem;
-            background-color: #89D99D; /* Using a hex color */
-            color: #1a1a1a; /* Using a hex color for dark */
+            background-color: #2D6DC4; /* Using a hex color */
+            color: #fff; /* Using a hex color for dark */
             border-radius: 5px;
             font-weight: 600;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -133,7 +133,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #5dcb75; /* Using a hex color */
+            background-color: #49cfff; /* Using a hex color */
             z-index: -1;
             transform: scaleX(0);
             transform-origin: right;
@@ -148,7 +148,7 @@
         .btn:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(59, 140, 110, 0.3);
-            color: #f8f8f8; /* Using a hex color for light */
+            color: #fff; /* Using a hex color for light */
         }
 
         .btn:hover::after {
@@ -203,7 +203,7 @@
         .custom-cursor {
             width: 20px;
             height: 20px;
-            background-color: #89D99D;
+            background-color: #2D6DC4;
             border-radius: 50%;
             position: fixed;
             pointer-events: none;
@@ -216,14 +216,15 @@
         .custom-cursor.link-hover {
             width: 50px;
             height: 50px;
-            background-color: rgba(137, 217, 157, 0.3);
-            border: 2px solid #89D99D;
+            background-color: rgba(73, 207, 255, 0.3);
+           /* color:rgb(73, 207, 255);*/
+            border: 2px solid #2D6DC4;
         }
         
         .custom-cursor.text-hover {
             width: 12px;
             height: 12px;
-            background-color: #5dcb75;
+            background-color: #49cfff;
         }
 
         /* Ensure interactive elements work properly */
@@ -259,7 +260,7 @@
             transform: translate(-50%, -50%) rotate(10deg);
             opacity: 0;
             transition: all 0.4s ease-out;
-            color: #5dcb75;
+            color: #49cfff;
         }
 
         .nav-link:hover::after,
@@ -301,7 +302,7 @@
         .contact-label {
             display: block;
             font-weight: 600;
-            color: #1a1a1a;
+            color: #ffffff;
             margin-bottom: 0.5rem;
         }
         .contact-input {
@@ -315,7 +316,7 @@
             color: #000;
         }
         .contact-input:focus {
-            outline: 2px solid #89D99D;
+            outline: 2px solid #2D6DC4;
             outline-offset: 2px;
         }
         .contact-radio-group {
@@ -342,8 +343,8 @@
             display: none;
         }
         .contact-radio-label input:checked + span {
-            background-color: #89D99D;
-            color: #1a1a1a;
+            background-color: #2D6DC4;
+            color: #fff;
             padding: 0.5rem 1.25rem;
             border-radius: 9999px;
             transform: scale(1.05);
@@ -355,8 +356,8 @@
              border-radius: 9999px;
         }
         .contact-submit-btn {
-            background-color: #89D99D;
-            color: #1a1a1a;
+            background-color: #2D6DC4;
+            color: #fff;
             font-weight: 600;
             padding: 1rem 2rem;
             border-radius: 8px;
@@ -365,7 +366,7 @@
             cursor: none;
         }
         .contact-submit-btn:hover {
-            background-color: #5dcb75;
+            background-color: #49cfff;
         }
         /* Adjusted text colors for the contact section to match the portfolio theme */
         .contact-info-text {
@@ -405,7 +406,7 @@
         <!-- The work page with true masonry layout -->
         <section id="work-page" class="masonry-container masonry-loading" aria-label="Portfolio projects">
             
-            <!-- Project 1 -->
+            <!-- Bad Boss -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="BadBoss.gif" alt="Animation of different bosses" class="w-full h-auto rounded-lg" loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -419,7 +420,21 @@
                 </div>
             </article>
 
-            <!-- Project 2 -->
+            <!-- Charlie -->
+            <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
+                <img src="charlie.png" alt="The Polymath Quiz" class="w-full h-auto rounded-lg " loading="lazy">
+                <div class="bg-white p-4 rounded-lg ">
+                    <h3 class="font-bold text-lg">The Incredible World of AI with Charlie</h3>
+                    <p class="text-sm mt-2 text-gray-700">
+                        Join Charlie on an exciting journey to explore the incredible world of AI! Test your knowledge of AI concepts and terms from "The Incredible World of AI with Charlie."<p>     
+                            <div class="btn-container pt-4">
+                                <a href="https://jerlyn.github.io/worldofai/" class="btn" aria-label="View project details for Vax Connect" target="_blank" data-project-name="Polymath Quiz">View Project <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></a>
+                            </div>
+                        </p></p>
+                </div>
+            </article>
+
+            <!-- Polymath -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="polymath.png" alt="The Polymath Quiz" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -434,7 +449,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
 
-            <!-- Project 3 -->
+            <!-- First Letter Friends -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="friends.png" alt="Image of an alligator" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -450,7 +465,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
 
-            <!-- Project 4 -->
+            <!-- Memory Game -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="Memory.png" alt="Matching ABCs" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -466,7 +481,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
             
-            <!-- Project 5 -->
+            <!-- ChatGPT DeYellow -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="deyellow.png" alt="Image of split view of deyellowed image" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -481,7 +496,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
             
-            <!-- Project 6 -->
+            <!-- Pacman -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="Pacman.png" alt="Screenshot of Pac Man" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -497,7 +512,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
             
-            <!-- Project 7 -->
+            <!-- TicTacToe -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="TicTacToe.png" alt="Tic Tac Toe screenshot" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -514,7 +529,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                 </div>
             </article>
 
-            <!-- Project 8 -->
+            <!-- Number -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="Number.png" alt="4 displayed numbers" class="w-full h-auto rounded-lg " loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -530,7 +545,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                     </p>
                 </div>
             </article>
-            <!-- Project 9 -->
+            <!-- Wordle -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
                 <img src="Worldle.png" alt="Screenshot of Wordle" class="w-full h-auto rounded-lg" loading="lazy">
                 <div class="bg-white p-4 rounded-lg ">
@@ -544,7 +559,7 @@ Do you feel like you don't quite fit into a single professional box? Do you see 
                     </p>
                 </div>
             </article>
-                      <!-- Project 10 -->
+                      <!-- Tetris -->
             <article class="masonry-item project-card bg-white rounded-lg shadow-sm" tabindex="0" role="article">
             <img src="tetris.png" alt="Retro Tetris screenshot" class="w-full h-auto rounded-lg" loading="lazy">
             <div class="bg-white p-4 rounded-lg ">
