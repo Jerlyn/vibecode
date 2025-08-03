@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comeback Generator | Design Lady LLC</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fffefe; /* Light gray background */
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #94a3b8;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="bg-white flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main Container -->
+    <div class="bg-white overflow-hidden max-w-4xl w-full flex flex-col lg:flex-row animate-fade-in-down">
+        <!-- Hero Image Section -->
+        <div class="lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br relative overflow-hidden">
+            <img src="comeback.png" alt="Comeback Generator Illustration" class="w-full h-auto object-contain rounded-xl transform hover:scale-105 transition-transform duration-300">
+        </div>
+
+        <!-- Content Section -->
+        <div class="lg:w-1/2 p-8 md:p-12 space-y-8 relative">
+            <!-- Header -->
+            <div class="text-center lg:text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2 leading-tight items-center">
+                   Comeback <span class="block text-purple-600">Generator</span>
+                </h1>
+                <p class="text-gray-500 text-lg md:text-xl font-light">
+                    Turn online negativity into witty comebacks.
+                </p>
+            </div>
+
+            <!-- Input Section -->
+            <div class="space-y-6">
+                <!-- Text Input -->
+                <div>
+                    <label for="troll-comment" class="block text-gray-700 font-semibold mb-2">Paste the troll comment:</label>
+                    <textarea id="troll-comment" 
+                              class="w-full p-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 resize-y min-h-[120px] bg-gray-50 text-gray-800"
+                              placeholder="Paste the comment that needs a witty response..."
+                              aria-label="Troll comment input"></textarea>
+                </div>
+
+                <!-- File Upload -->
+                <div class="relative">
+                    <label for="screenshot-upload" class="block text-gray-700 font-semibold mb-2">Or upload a screenshot:</label>
+                    <div id="file-upload-area" 
+                         class="flex flex-col items-center justify-center w-full h-32 rounded-xl border-2 border-dashed border-gray-300 p-4 cursor-pointer text-gray-500 transition-all duration-300 hover:border-purple-500 hover:bg-purple-50 hover:text-purple-700">
+                        <svg class="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span id="file-upload-text" class="text-sm font-medium text-center">📸 Click to upload screenshot or drag & drop</span>
+                        <input type="file" id="screenshot-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" aria-label="Screenshot file upload">
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <button id="generate-button" 
+                        class="w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg transform transition-all duration-200
+                               bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 hover:scale-105
+                               focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    ✨ Generate Comeback
+                </button>
+            </div>
+
+            <!-- Response Section -->
+            <div id="response-section" class="hidden space-y-4 animate-fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-pink-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+                    </svg>
+                    Your Witty Response
+                </h2>
+                <div id="response-text" class="p-6 bg-gray-50 rounded-xl border border-gray-200 text-gray-800 text-lg leading-relaxed">
+                    <!-- Response text will appear here -->
+                </div>
+                <div class="flex gap-3">
+                    <button id="copy-button" 
+                            class="flex-1 py-3 rounded-xl bg-purple-600 text-white font-semibold transition-all duration-200 hover:bg-purple-700
+                                   focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                        📋 Copy Response
+                    </button>
+                    <button id="regenerate-button" 
+                            class="px-4 py-3 rounded-xl bg-gray-600 text-white font-semibold transition-all duration-200 hover:bg-gray-700
+                                   focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        🔄
+                    </button>
+                </div>
+                <div id="response-type-indicator" class="text-sm text-gray-600 italic"></div>
+            </div>
+            
+            <!-- Toast Notification Area -->
+            <div id="toast-container" class="fixed top-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm"></div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript for functionality -->
+    <script>
+        // Enhanced Response Categories with Smart Analysis
+        const responses = {
+            general: [
+                "Thanks for confirming that reading comprehension isn't for everyone! 📚",
+                "I appreciate you taking time out of your busy schedule of being wrong on the internet to comment. 💭",
+                "Your comment has been forwarded to the Department of Irrelevant Opinions. They'll get back to you never. 📧",
+                "I see you've chosen chaos today. Bold choice! 🎭",
+                "That's certainly one way to announce you didn't read the post. 📖",
+                "Thank you for this demonstration of why critical thinking skills matter. 🧠",
+                "I'm impressed by your confidence in being incorrect. That takes real commitment! 💪",
+                "Your comment has been reviewed by our team of experts and filed under 'Creative Fiction.' 📁",
+                "I love how you turned a simple post into an opportunity to showcase your personality. Very efficient! ⚡",
+                "That comment really said more about you than me, and I'm here for the self-awareness journey! 🪞"
+            ],
+            snarky: [
+                "Bless your heart, you tried! 💝",
+                "I'd explain it to you, but I left my crayons at home. 🖍️",
+                "That's a unique perspective! Did you develop it yourself? 🎨",
+                "I see you've mastered the art of confidently incorrect commenting. Impressive! 🎪",
+                "Your dedication to missing the point is truly inspiring. 🎯",
+                "I admire your ability to turn every conversation into performance art. 🎭",
+                "That comment aged like milk in the sun, but thanks for playing! 🥛",
+                "I'm adding 'Professional Opinion Haver' to your LinkedIn for you. 💼",
+                "Your comment is like a GPS with no signal - confidently going nowhere. 🗺️",
+                "I see you've activated 'Main Character Syndrome.' How's that working out? 🌟"
+            ],
+            dismissive: [
+                "Anyway, moving on to actual conversations... 🚶‍♀️",
+                "This energy could power a small village, but I'll pass. ⚡",
+                "I don't remember asking, but thanks for sharing your diary entry! 📖",
+                "That's nice, dear. Adults are talking now. 👥",
+                "Your comment has been noted and promptly forgotten. Next! ⏭️",
+                "I'm sure that made sense in your head. Keep trying! 💭",
+                "That's definitely a comment that exists. Moving on! ✨",
+                "I see you've confused this with your personal blog. Easy mistake! 📝",
+                "Your input has been received and will be processed never. 🗑️",
+                "I'd engage, but I don't speak fluent nonsense today. Maybe tomorrow! 🌅"
+            ],
+            philosophical: [
+                "What a fascinating window into your inner world. Thanks for sharing! 🪟",
+                "Your comment is like abstract art - I'm sure it means something to someone. 🎨",
+                "I appreciate you taking time to contribute to the conversation in your own special way. 🌟",
+                "That's certainly one interpretation of reality. How creative! 🌈",
+                "Your perspective is as unique as it is... unexpected. 🦄",
+                "I see you're really committed to your version of events. Dedication! 🏆",
+                "That comment took courage. Not wisdom, but definitely courage! 🦁",
+                "I love how you've turned discussion into interpretive dance. Very avant-garde! 💃",
+                "Your ability to find offense where none exists is truly a talent. 🎭",
+                "I see you've chosen the road less traveled by logic. Scenic route! 🛤️"
+            ],
+            savage: [
+                "The audacity is impressive. The logic, however, is still missing. 🔍",
+                "I see you've brought a butter knife to a battle of wits. How charming! 🧈",
+                "Your comment has the same energy as a participation trophy. Congratulations! 🏆",
+                "I'd agree with you, but then we'd both be wrong, and that's just inefficient. ⚡",
+                "This comment sponsored by the Dunning-Kruger effect. 🧠",
+                "I see you've chosen violence... against logic. Bold strategy! ⚔️",
+                "Your confidence could power a small city. Your accuracy, however, could not power a nightlight. 💡",
+                "I'm genuinely impressed by your ability to be consistently incorrect. That's a skill! 🎯",
+                "This comment has the same energy as a flat-earther at NASA. Fascinating! 🌍",
+                "I see we're operating on different planes of existence. How interdimensional of you! 🌌"
+            ],
+            professional: [
+                "I appreciate your perspective, though I respectfully disagree with your interpretation. 💼",
+                "Thank you for sharing your thoughts. I'll consider them accordingly. 🤝",
+                "I understand we have different viewpoints on this matter. That's perfectly fine. 📊",
+                "Your feedback has been noted and will be given the consideration it deserves. 📝",
+                "I can see we approach this topic from different angles. Interesting perspective! 📐",
+                "Thank you for taking the time to engage. I hope we can find common ground. 🌉",
+                "I appreciate the dialogue, even when we don't see eye to eye. 👥",
+                "Your comment adds to the diversity of opinions on this topic. Thank you. 🎭",
+                "I respect your right to have a different opinion, even if I don't share it. ⚖️",
+                "Thanks for contributing to the conversation in your unique way. 💭"
+            ],
+            educational: [
+                "This seems like a great opportunity to learn something new! Here's another perspective... 📚",
+                "I see where the confusion might come from. Let me clarify... 💡",
+                "That's an interesting take! Here's some additional context that might help... 🔍",
+                "I understand why you might think that. Here's what the research actually shows... 📊",
+                "Great question! This is actually a common misconception. The reality is... 🎯",
+                "I appreciate you bringing this up. It gives me a chance to share some fascinating facts... ✨",
+                "That's a perspective I used to share too! Then I learned... 🌱",
+                "This touches on something really important. Let me explain why... 🔗",
+                "You've highlighted an interesting point. Here's the broader context... 🌍",
+                "That's worth exploring further. Based on the available evidence... 🔬"
+            ]
+        };
+
+        // Enhanced keyword detection system
+        const analysisPatterns = {
+            savage: {
+                keywords: ['stupid', 'dumb', 'idiot', 'moron', 'loser', 'pathetic', 'worthless', 'garbage', 'trash', 'useless'],
+                weight: 3
+            },
+            snarky: {
+                keywords: ['wrong', 'fake', 'lie', 'lies', 'false', 'nonsense', 'ridiculous', 'absurd', 'crazy', 'insane'],
+                weight: 2
+            },
+            dismissive: {
+                keywords: ['whatever', 'boring', 'lame', 'cringe', 'basic', 'typical', 'predictable', 'meh'],
+                weight: 2
+            },
+            professional: {
+                keywords: ['disagree', 'opinion', 'perspective', 'think', 'believe', 'consider', 'suggest'],
+                weight: 1
+            },
+            educational: {
+                keywords: ['why', 'how', 'what', 'explain', 'understand', 'confused', 'question', 'help'],
+                weight: 1
+            }
+        };
+
+        // UI Elements
+        const trollCommentTextarea = document.getElementById('troll-comment');
+        const screenshotUploadInput = document.getElementById('screenshot-upload');
+        const generateButton = document.getElementById('generate-button');
+        const responseSection = document.getElementById('response-section');
+        const responseTextElement = document.getElementById('response-text');
+        const fileUploadText = document.getElementById('file-upload-text');
+        const fileUploadArea = document.getElementById('file-upload-area');
+        const copyButton = document.getElementById('copy-button');
+        const regenerateButton = document.getElementById('regenerate-button');
+        const responseTypeIndicator = document.getElementById('response-type-indicator');
+        const toastContainer = document.getElementById('toast-container');
+        
+        let selectedFile = null;
+        let lastAnalyzedComment = '';
+        let lastResponseType = 'general';
+
+        // Custom toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            let bgColor = '';
+            let textColor = '';
+            
+            if (type === 'success') {
+                bgColor = 'bg-green-500';
+                textColor = 'text-white';
+            } else if (type === 'error') {
+                bgColor = 'bg-red-500';
+                textColor = 'text-white';
+            } else {
+                bgColor = 'bg-gray-800';
+                textColor = 'text-white';
+            }
+
+            toast.className = `${bgColor} ${textColor} p-4 rounded-xl shadow-lg mb-4 text-center animate-fade-in-up transform transition-transform duration-300`;
+            toast.textContent = message;
+            
+            // Add toast to the container
+            toastContainer.appendChild(toast);
+
+            // Animate it out after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('animate-fade-in-up');
+                toast.classList.add('animate-fade-out-down');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Enhanced analysis function
+        function analyzeComment(comment) {
+            const lowerComment = comment.toLowerCase();
+            const scores = {};
+            
+            // Initialize scores
+            Object.keys(analysisPatterns).forEach(type => {
+                scores[type] = 0;
+            });
+            
+            // Keyword analysis
+            Object.entries(analysisPatterns).forEach(([type, pattern]) => {
+                pattern.keywords.forEach(keyword => {
+                    if (lowerComment.includes(keyword)) {
+                        scores[type] += pattern.weight;
+                    }
+                });
+            });
+            
+            // Length analysis
+            if (comment.length > 200) {
+                scores.philosophical += 2;
+            } else if (comment.length < 30) {
+                scores.dismissive += 1;
+            }
+            
+            // CAPS analysis
+            const capsWords = comment.split(' ').filter(word => word === word.toUpperCase() && word.length > 2);
+            if (capsWords.length > 2) {
+                scores.savage += 2;
+                scores.snarky += 1;
+            }
+            
+            // Punctuation analysis
+            const exclamationCount = (comment.match(/!/g) || []).length;
+            const questionCount = (comment.match(/\?/g) || []).length;
+            
+            if (exclamationCount > 2) {
+                scores.savage += 1;
+                scores.snarky += 1;
+            }
+            
+            if (questionCount > 1) {
+                scores.educational += 1;
+                scores.professional += 1;
+            }
+            
+            // Find the highest scoring type
+            const maxScore = Math.max(...Object.values(scores));
+            const bestTypes = Object.keys(scores).filter(type => scores[type] === maxScore);
+            
+            // If multiple types tie, use some logic to pick the best one
+            if (bestTypes.length > 1) {
+                if (bestTypes.includes('savage') && maxScore > 2) return 'savage';
+                if (bestTypes.includes('snarky') && maxScore > 1) return 'snarky';
+                if (bestTypes.includes('professional')) return 'professional';
+                if (bestTypes.includes('educational')) return 'educational';
+            }
+            
+            return bestTypes[0] || 'general';
+        }
+
+        function displayResponse(responseText, responseType, withAnimation = true) {
+            responseTextElement.textContent = '';
+            responseSection.classList.remove('hidden');
+            responseTypeIndicator.textContent = `Response Type: ${responseType.charAt(0).toUpperCase() + responseType.slice(1)}`;
+            
+            if (withAnimation) {
+                // Typing animation
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < responseText.length) {
+                        responseTextElement.textContent += responseText.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 30);
+                    }
+                };
+                typeWriter();
+            } else {
+                responseTextElement.textContent = responseText;
+            }
+        }
+
+        function generateResponse(isRegenerate = false) {
+            const comment = trollCommentTextarea.value.trim();
+            
+            if (!comment && !selectedFile && !isRegenerate) {
+                showToast('Please enter a comment or upload a screenshot!', 'error');
+                return;
+            }
+
+            // Show loading state
+            generateButton.disabled = true;
+            generateButton.innerHTML = `
+                <svg class="animate-spin h-5 w-5 mr-3 text-white inline" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Analyzing...
+            `;
+
+            // Simulate processing time for better UX
+            setTimeout(() => {
+                let responseType = 'general';
+                
+                if (comment) {
+                    responseType = analyzeComment(comment);
+                    lastAnalyzedComment = comment;
+                    lastResponseType = responseType;
+                } else if (isRegenerate && lastAnalyzedComment) {
+                    responseType = lastResponseType;
+                } else if (selectedFile) {
+                    // Random selection weighted toward common troll response types
+                    const fileResponseTypes = ['snarky', 'dismissive', 'general', 'philosophical'];
+                    responseType = fileResponseTypes[Math.floor(Math.random() * fileResponseTypes.length)];
+                }
+
+                // Get random response from selected category
+                const selectedResponses = responses[responseType];
+                const randomResponse = selectedResponses[Math.floor(Math.random() * selectedResponses.length)];
+
+                // Display response
+                displayResponse(randomResponse, responseType, !isRegenerate);
+
+                // Reset button
+                generateButton.disabled = false;
+                generateButton.innerHTML = '✨ Generate Another Response';
+
+                // Scroll to response
+                setTimeout(() => {
+                    responseSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, isRegenerate ? 0 : 500);
+                
+                // Show success toast
+                showToast('Response generated successfully!', 'success');
+                
+                // Show analysis info (for development/debugging)
+                console.log(`Detected response type: ${responseType} for comment: "${comment}"`);
+            }, 1200);
+        }
+
+        // --- File Upload Logic ---
+        function handleFileSelect(file) {
+            selectedFile = file;
+            if (selectedFile) {
+                fileUploadText.textContent = `📸 ${selectedFile.name} selected`;
+                trollCommentTextarea.placeholder = 'Screenshot uploaded! Add text context for a better response...';
+                fileUploadArea.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700');
+            } else {
+                fileUploadText.textContent = '📸 Click to upload screenshot or drag & drop';
+                trollCommentTextarea.placeholder = 'Paste the comment that needs a witty response...';
+                fileUploadArea.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700');
+            }
+        }
+
+        // Listen for file input change
+        screenshotUploadInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop events
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.add('border-purple-500', 'bg-purple-50', 'text-purple-700');
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            if (!selectedFile) {
+                fileUploadArea.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700');
+            }
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.classList.remove('border-purple-500', 'bg-purple-50', 'text-purple-700');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                screenshotUploadInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // Event Listeners
+        generateButton.addEventListener('click', () => generateResponse(false));
+        regenerateButton.addEventListener('click', () => generateResponse(true));
+        
+        // Add keyboard shortcut for generation (Ctrl + Enter)
+        trollCommentTextarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateResponse(false);
+            }
+        });
+
+        // --- Copy Logic ---
+        function copyResponse() {
+            const responseText = responseTextElement.textContent;
+            
+            if (responseText) {
+                // Use modern clipboard API
+                navigator.clipboard.writeText(responseText)
+                    .then(() => {
+                        showToast('Response copied to clipboard!', 'success');
+                        copyButton.textContent = '✅ Copied!';
+                        setTimeout(() => {
+                            copyButton.textContent = '📋 Copy Response';
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy to clipboard:', err);
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = responseText;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            showToast('Response copied to clipboard!', 'success');
+                            copyButton.textContent = '✅ Copied!';
+                            setTimeout(() => {
+                                copyButton.textContent = '📋 Copy Response';
+                            }, 2000);
+                        } catch (e) {
+                            showToast('Failed to copy. Please copy manually.', 'error');
+                        } finally {
+                            document.body.removeChild(textArea);
+                        }
+                    });
+            }
+        }
+
+        copyButton.addEventListener('click', copyResponse);
+    </script>
+
+</body>
+</html>
