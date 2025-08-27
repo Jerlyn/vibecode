@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Natural Language Transcriber</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-gray-800 p-8 rounded-2xl shadow-xl max-w-2xl w-full flex flex-col items-center space-y-6 border border-gray-700">
+        <!-- Main title and description -->
+        <h1 class="text-3xl font-bold text-center text-blue-400">Natural Language Transcriber</h1>
+        <p class="text-center text-gray-400">
+            Click "Start Transcribing" to begin. </br>The transcribed text will appear below in real-time.
+        </p>
+
+        <!-- Status message area -->
+        <div id="statusMessage" class="text-sm text-center text-gray-500 min-h-[1.5rem]">
+            Ready to transcribe.
+        </div>
+
+        <!-- Start/Stop, Reset and Copy Button container -->
+        <div class="flex space-x-4">
+            <button id="startButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Start Transcribing
+            </button>
+            <button id="stopButton" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 hidden">
+                Stop Transcribing
+            </button>
+            <button id="resetButton" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 hidden">
+                Reset Text
+            </button>
+            <!-- New Copy Button -->
+            <button id="copyButton" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2m4 0h-4m4 0a2 2 0 012 2v2a2 2 0 01-2 2h-4a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v2m-6 0h2m-2-2a2 2 0 00-2-2h-4a2 2 0 00-2 2v10a2 2 0 002 2h4a2 2 0 002-2V9a2 2 0 00-2-2h-4m2 0a2 2 0 00-2 2v2a2 2 0 002 2h4a2 2 0 002-2V9a2 2 0 00-2-2h-4z" />
+                </svg>
+                Copy Text
+            </button>
+        </div>
+
+        <!-- Transcribed text area -->
+        <div class="bg-gray-700 text-gray-300 p-4 rounded-xl w-full h-80 overflow-y-auto border border-gray-600">
+            <p id="transcriptionOutput" class="whitespace-pre-wrap leading-relaxed"></p>
+        </div>
+
+        <!-- A message box for displaying messages instead of alert() -->
+        <div id="messageBox" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden items-center justify-center">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                <p id="messageText" class="text-xl font-medium"></p>
+                <button id="messageCloseButton" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">OK</button>
+            </div>
+        </div>
+        
+        <!-- Footer with the new link -->
+        <footer class="mt-8 text-sm text-gray-500">
+            Created with ❤️ by <a href="http://www.designlady.com" target="_blank" class="text-blue-400 hover:text-blue-300">Design Lady LLC</a>
+        </footer>
+    </div>
+
+    <script>
+        // Check for Web Speech API compatibility
+        if (!('webkitSpeechRecognition' in window)) {
+            showErrorMessage("Your browser does not support the Web Speech API. Please try using Google Chrome.");
+        } else {
+            // Get references to all the necessary DOM elements
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+            const resetButton = document.getElementById('resetButton');
+            const copyButton = document.getElementById('copyButton'); // Get the new copy button
+            const transcriptionOutput = document.getElementById('transcriptionOutput');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Set up the message box
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const messageCloseButton = document.getElementById('messageCloseButton');
+
+            // Function to show a message in the custom message box
+            function showErrorMessage(message) {
+                messageText.textContent = message;
+                messageBox.classList.remove('hidden');
+                messageBox.classList.add('flex');
+            }
+
+            // Event listener to close the message box
+            messageCloseButton.addEventListener('click', () => {
+                messageBox.classList.add('hidden');
+                messageBox.classList.remove('flex');
+            });
+
+            // Create a new SpeechRecognition object
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = true; // Keep listening even if the user pauses
+            recognition.interimResults = true; // Show results as they are being transcribed
+
+            let finalTranscript = ''; // Stores the full, final transcription
+            let isTranscribing = false;
+
+            // Event handler for when a transcription result is received
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                // Display the combined final and interim transcripts
+                transcriptionOutput.textContent = finalTranscript + interimTranscript;
+            };
+
+            // Event handler for when the transcription starts
+            recognition.onstart = () => {
+                isTranscribing = true;
+                statusMessage.textContent = "Listening... speak now.";
+                startButton.classList.add('hidden');
+                stopButton.classList.remove('hidden');
+                resetButton.classList.add('hidden');
+                copyButton.classList.add('hidden'); // Hide the copy button while transcribing
+            };
+
+            // Event handler for when the transcription stops
+            recognition.onend = () => {
+                isTranscribing = false;
+                statusMessage.textContent = "Transcription stopped.";
+                startButton.classList.remove('hidden');
+                stopButton.classList.add('hidden');
+                resetButton.classList.remove('hidden');
+                copyButton.classList.remove('hidden'); // Show the copy button when transcription stops
+            };
+
+            // Event handler for errors
+            recognition.onerror = (event) => {
+                isTranscribing = false;
+                if (event.error === 'not-allowed') {
+                    showErrorMessage('Permission to use microphone was denied. Please allow microphone access in your browser settings.');
+                } else {
+                    showErrorMessage('An error occurred: ' + event.error);
+                }
+                recognition.onend(); // Ensure buttons are reset
+            };
+
+            // Start transcription button click handler
+            startButton.addEventListener('click', () => {
+                if (!isTranscribing) {
+                    // Reset the transcript before starting
+                    finalTranscript = '';
+                    transcriptionOutput.textContent = '';
+                    recognition.start();
+                }
+            });
+
+            // Stop transcription button click handler
+            stopButton.addEventListener('click', () => {
+                if (isTranscribing) {
+                    recognition.stop();
+                }
+            });
+
+            // Reset text button click handler
+            resetButton.addEventListener('click', () => {
+                finalTranscript = '';
+                transcriptionOutput.textContent = '';
+                statusMessage.textContent = "Text has been cleared.";
+                resetButton.classList.add('hidden');
+                copyButton.classList.add('hidden'); // Hide the copy button when text is cleared
+            });
+            
+            // Copy text button click handler
+            copyButton.addEventListener('click', () => {
+                const textToCopy = transcriptionOutput.textContent;
+                if (textToCopy) {
+                    // Use a temporary textarea to perform the copy command
+                    const tempTextArea = document.createElement('textarea');
+                    tempTextArea.value = textToCopy;
+                    document.body.appendChild(tempTextArea);
+                    tempTextArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempTextArea);
+                    statusMessage.textContent = 'Text copied to clipboard!';
+                } else {
+                    statusMessage.textContent = 'No text to copy.';
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
