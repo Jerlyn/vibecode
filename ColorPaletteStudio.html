@@ -9,6 +9,16 @@
     <!-- PDF Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ER71NPEXGM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-ER71NPEXGM');
+    </script>
     <style>
         * {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -410,6 +420,10 @@
             showToast('No results to export. Analyze your palette first.', 'error');
             return;
         }
+        gtag('event', 'export_results', {
+            'event_category': 'Engagement',
+            'event_label': 'PDF Export'
+        });
 
         // Elements to temporarily hide from the PDF
         const elementsToHide = document.querySelectorAll('#detailed-results .grid.grid-cols-2.gap-6.mb-6, #detailed-results button.text-sm.text-gray-500');
@@ -510,6 +524,10 @@
     }
 
     function addColorInput(color = '#FFFFFF', label = 'Custom Color') {
+        gtag('event', 'add_color', {
+            'event_category': 'Interaction',
+            'event_label': 'New Color Added'
+        });
         const colorInputs = document.getElementById('color-inputs');
         const newInput = document.createElement('div');
         newInput.className = 'color-input-group p-4 slide-up';
@@ -552,6 +570,10 @@
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
             showToast('Copied to clipboard!', 'success');
+            gtag('event', 'copy_hex_code', {
+                'event_category': 'Interaction',
+                'event_label': 'Color Hex Code Copied'
+            });
         });
     }
 
@@ -603,6 +625,13 @@
             showToast('Add at least 2 colors to analyze', 'error');
             return;
         }
+
+        // Send a custom event to Google Analytics
+        gtag('event', 'analyze_palette', {
+            'event_category': 'Interaction',
+            'event_label': 'Palette Analysis',
+            'value': colors.length
+        });
 
         // Update sticky preview
         updateStickyPreview(colors);
@@ -815,6 +844,10 @@
         // Close sticky preview
         document.getElementById('close-preview').addEventListener('click', () => {
             stickyPreview.classList.add('hidden');
+            gtag('event', 'close_preview', {
+                'event_category': 'Interaction',
+                'event_label': 'Live Preview Closed'
+            });
         });
         
         // Add color button
@@ -834,6 +867,10 @@
             });
             
             showToast('Brand palette loaded!', 'success');
+            gtag('event', 'load_brand_palette', {
+                'event_category': 'Interaction',
+                'event_label': 'Brand Palette Loaded'
+            });
         });
         
         // Analyze button
@@ -850,6 +887,10 @@
                 e.target.closest('.color-input-group').remove();
                 updateRemoveButtonVisibility();
                 updateProgress();
+                gtag('event', 'remove_color', {
+                    'event_category': 'Interaction',
+                    'event_label': 'Color Removed'
+                });
             }
         });
         
