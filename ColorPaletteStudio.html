@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Lady - Brand Color Palette Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #36069A 0%, #DE6399 50%, #020C28 100%);
+            position: relative;
+        }
+        
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(222, 99, 153, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(54, 6, 154, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .color-swatch {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .color-swatch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .color-swatch:hover::before {
+            left: 100%;
+        }
+        
+        .pulse-ring {
+            animation: pulse-ring 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            80% { transform: scale(1.2); opacity: 0; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .accessibility-badge {
+            background: linear-gradient(135deg, #10B981, #059669);
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+        }
+        
+        .warning-badge {
+            background: linear-gradient(135deg, #F59E0B, #D97706);
+            box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.39);
+        }
+        
+        .error-badge {
+            background: linear-gradient(135deg, #EF4444, #DC2626);
+            box-shadow: 0 4px 14px 0 rgba(239, 68, 68, 0.39);
+        }
+        
+        .color-input-group {
+            background: #FAFAFA;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .color-input-group:hover {
+            background: #F5F5F5;
+            border-color: #36069A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(54, 6, 154, 0.15);
+        }
+        
+        .color-input-group.focused {
+            border-color: #DE6399;
+            background: white;
+        }
+        
+        .tooltip {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            transform: translateY(10px);
+        }
+        
+        .tooltip.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #DC2626 0%, #F59E0B 25%, #10B981 50%, #059669 100%);
+        }
+        
+        .brand-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23DE6399' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-white to-slate-100 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white relative overflow-hidden">
+        <div class="relative z-10 container mx-auto px-6 py-16 lg:py-24">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="inline-flex items-center px-4 py-2 rounded-full glassmorphism text-sm font-medium mb-6">
+                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                    AI-Powered Accessibility Analysis
+                </div>
+                <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6">
+                    Color Palette Studio
+                </h1>
+                <p class="text-xl lg:text-2xl font-light opacity-90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Build inclusive brand experiences with real-time WCAG compliance checking, 
+                    color blindness simulation, and intelligent palette recommendations.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3 text-sm">
+                    <span class="px-4 py-2 glassmorphism rounded-full">WCAG 2.1 AA/AAA</span>
+                    <span class="px-4 py-2 glassmorphism rounded-full">Color Blind Safe</span>
+                    <span class="px-4 py-2 glassmorphism rounded-full">Export Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sticky Live Preview -->
+    <div id="sticky-preview" class="fixed top-0 left-0 right-0 bg-white border-b shadow-lg z-40 transform -translate-y-full transition-transform duration-300 hidden">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">Live Preview</h3>
+                <button id="close-preview" class="text-gray-400 hover:text-gray-600">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div id="sticky-preview-content" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <!-- Preview content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-6 py-12">
+        <!-- Progress Indicator -->
+        <div class="max-w-4xl mx-auto mb-12">
+            <div class="flex items-center justify-between text-sm font-medium text-gray-600 mb-2">
+                <span>Palette Builder</span>
+                <span id="progress-text">0% Complete</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="progress-bar h-2 rounded-full transition-all duration-500" style="width: 0%" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Color Input Section -->
+        <section class="max-w-4xl mx-auto mb-16">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Build Your Palette</h2>
+                <p class="text-lg text-gray-600">Start with my brand colors or explore new combinations</p>
+            </div>
+            
+            <!-- Preset Brand Palette -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Design Lady Brand Colors</h3>
+                    <button id="load-brand-colors" class="text-sm bg-gradient-to-r from-purple-600 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transition-all duration-300">
+                        Load Brand Palette
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <div class="color-swatch bg-[#36069A] h-16 rounded-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer" data-color="#36069A">Primary</div>
+                    <div class="color-swatch bg-[#DE6399] h-16 rounded-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer" data-color="#DE6399">Secondary</div>
+                    <div class="color-swatch bg-[#020C28] h-16 rounded-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer" data-color="#020C28">Accent</div>
+                    <div class="color-swatch bg-[#F8F9FA] h-16 rounded-lg flex items-center justify-center text-gray-700 text-xs font-medium border-2 border-gray-200 cursor-pointer" data-color="#F8F9FA">Light</div>
+                    <div class="color-swatch bg-[#212529] h-16 rounded-lg flex items-center justify-center text-white text-xs font-medium cursor-pointer" data-color="#212529">Dark</div>
+                </div>
+            </div>
+
+            <!-- Color Input Grid -->
+            <div id="color-inputs" class="space-y-4 mb-6">
+                <div class="color-input-group p-4">
+                    <div class="flex items-center space-x-4">
+                        <input type="color" value="#36069A" class="w-16 h-16 rounded-xl border-0 cursor-pointer shadow-lg">
+                        <div class="flex-1">
+                            <input type="text" value="#36069A" maxlength="7" class="w-full text-lg font-mono font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none uppercase" placeholder="#000000">
+                            <p class="text-sm text-gray-500 mt-1">Primary Brand Color</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="copy-btn p-2 text-gray-400 hover:text-purple-600 transition-colors duration-200" title="Copy hex code">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                            <button class="remove-btn p-2 text-gray-400 hover:text-red-500 transition-colors duration-200 opacity-0" title="Remove color">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 6L6 18M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="color-input-group p-4">
+                    <div class="flex items-center space-x-4">
+                        <input type="color" value="#DE6399" class="w-16 h-16 rounded-xl border-0 cursor-pointer shadow-lg">
+                        <div class="flex-1">
+                            <input type="text" value="#DE6399" maxlength="7" class="w-full text-lg font-mono font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none uppercase" placeholder="#000000">
+                            <p class="text-sm text-gray-500 mt-1">Secondary Brand Color</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="copy-btn p-2 text-gray-400 hover:text-purple-600 transition-colors duration-200" title="Copy hex code">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                        </button>
+                        <button class="remove-btn p-2 text-gray-400 hover:text-red-500 transition-colors duration-200 opacity-0" title="Remove color">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <button id="add-color-btn" class="flex items-center justify-center px-6 py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-purple-400 hover:text-purple-600 transition-all duration-300">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Add Color
+            </button>
+            <button id="analyze-btn" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+                <span class="flex items-center justify-center">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
+                        <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h11l5-5V9a2 2 0 0 0-2-2h-4"></path>
+                        <circle cx="9" cy="9" r="2"></circle>
+                    </svg>
+                    Analyze Accessibility
+                </span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="max-w-6xl mx-auto hidden">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Color Analysis Results</h2>
+            <div id="overview-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto">
+                <!-- Stats will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Detailed Results -->
+        <div id="detailed-results" class="space-y-8">
+            <!-- Results will be populated by JS -->
+        </div>
+    </section>
+</main>
+
+<!-- Floating Export Button -->
+<button class="floating-action hidden fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 flex items-center justify-center group cursor-pointer" id="export-fab" onclick="exportResults()" title="Export Analysis Results">
+    <div class="absolute inset-0 pulse-ring bg-purple-400 rounded-full pointer-events-none"></div>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="relative z-10 group-hover:scale-110 transition-transform duration-200">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7,10 12,15 17,10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+</button>
+
+<!-- Toast Notifications -->
+<div id="toast-container" class="fixed top-6 right-6 z-50 space-y-2">
+    <!-- Toasts will be added here -->
+</div>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 text-center text-sm py-6 mt-12 border-t border-gray-800">
+    <p>Created with <span role="img" aria-label="love">❤️</span> by <a href="http://www.designlady.com" target="_blank" class="text-purple-400 hover:text-purple-300 transition-colors duration-200 font-medium">DesignLady.com.</a> For accessibility audit by a CPACC professional, email <a href="mailto:jerlyn@designlady.com" class="text-purple-400 hover:text-purple-300 transition-colors duration-200 font-medium">jerlyn@designlady.com</a></p>
+</footer>
+
+<script>
+    // Utility Functions
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function getLuminance(r, g, b) {
+        const [rs, gs, bs] = [r, g, b].map(c => {
+            c /= 255;
+            return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+
+    function getContrastRatio(color1, color2) {
+        const lum1 = getLuminance(color1.r, color1.g, color1.b);
+        const lum2 = getLuminance(color2.r, color2.g, color2.b);
+        const brightest = Math.max(lum1, lum2);
+        const darkest = Math.min(lum1, lum2);
+        return (brightest + 0.05) / (darkest + 0.05);
+    }
+
+    function rgbStringToRgb(rgbString) {
+        const result = /rgb\((\d+),\s*(\d+),\s*(\d+)\)/.exec(rgbString);
+        return result ? { r: parseInt(result[1]), g: parseInt(result[2]), b: parseInt(result[3]) } : null;
+    }
+
+    // Color blindness simulation functions
+    function adjustForProtanopia(rgb) { 
+        return `rgb(${Math.round(0.567 * rgb.r + 0.433 * rgb.g)}, ${Math.round(0.558 * rgb.r + 0.442 * rgb.g)}, ${Math.round(0 * rgb.r + 0 * rgb.g + 1 * rgb.b)})`;
+    }
+    
+    function adjustForDeuteranopia(rgb) { 
+        return `rgb(${Math.round(0.625 * rgb.r + 0.375 * rgb.g)}, ${Math.round(0.70 * rgb.r + 0.30 * rgb.g)}, ${Math.round(0 * rgb.r + 0 * rgb.g + 1 * rgb.b)})`;
+    }
+    
+    function adjustForTritanopia(rgb) { 
+        return `rgb(${Math.round(0.95 * rgb.r + 0.05 * rgb.g)}, ${Math.round(0.433 * rgb.g + 0.567 * rgb.b)}, ${Math.round(0.475 * rgb.r + 0.525 * rgb.b)})`;
+    }
+
+    function generateColorBlindnessFeedback(color1, color2) {
+        const rgb1 = hexToRgb(color1);
+        const rgb2 = hexToRgb(color2);
+        
+        const protan1 = adjustForProtanopia(rgb1);
+        const protan2 = adjustForProtanopia(rgb2);
+        const deuter1 = adjustForDeuteranopia(rgb1);
+        const deuter2 = adjustForDeuteranopia(rgb2);
+        const tritan1 = adjustForTritanopia(rgb1);
+        const tritan2 = adjustForTritanopia(rgb2);
+
+        const simulatedProtanopiaContrast = getContrastRatio(rgbStringToRgb(protan1), rgbStringToRgb(protan2));
+        const simulatedDeuteranopiaContrast = getContrastRatio(rgbStringToRgb(deuter1), rgbStringToRgb(deuter2));
+        const simulatedTritanopiaContrast = getContrastRatio(rgbStringToRgb(tritan1), rgbStringToRgb(tritan2));
+        
+        let feedback = 'Colors are distinguishable for most vision types.';
+        let feedbackClass = 'text-green-600 bg-green-50';
+        
+        if (simulatedProtanopiaContrast < 2) {
+            feedback = '⚠️ High risk for **Protanopia** (red-green blindness). Colors may appear very similar or merge.';
+            feedbackClass = 'text-red-600 bg-red-50';
+        } else if (simulatedDeuteranopiaContrast < 2) {
+            feedback = '⚠️ High risk for **Deuteranopia** (green-red blindness). Colors may appear very similar or merge.';
+            feedbackClass = 'text-red-600 bg-red-50';
+        } else if (simulatedTritanopiaContrast < 2) {
+            feedback = '⚠️ High risk for **Tritanopia** (blue-yellow blindness). Colors may appear very similar or merge.';
+            feedbackClass = 'text-red-600 bg-red-50';
+        } else if (simulatedProtanopiaContrast < 3 || simulatedDeuteranopiaContrast < 3 || simulatedTritanopiaContrast < 3) {
+            feedback = '⚠️ Moderate risk for color vision deficiencies. Consider testing with affected users.';
+            feedbackClass = 'text-yellow-600 bg-yellow-50';
+        }
+
+        return { 
+            feedback, 
+            feedbackClass, 
+            simulations: {
+                protanopia: { color1: protan1, color2: protan2, contrast: simulatedProtanopiaContrast },
+                deuteranopia: { color1: deuter1, color2: deuter2, contrast: simulatedDeuteranopiaContrast },
+                tritanopia: { color1: tritan1, color2: tritan2, contrast: simulatedTritanopiaContrast }
+            }
+        };
+    }
+
+    async function exportResults() {
+        const resultsSection = document.getElementById('results-section');
+        if (resultsSection.classList.contains('hidden')) {
+            showToast('No results to export. Analyze your palette first.', 'error');
+            return;
+        }
+
+        // Elements to temporarily hide from the PDF
+        const elementsToHide = document.querySelectorAll('#detailed-results .grid.grid-cols-2.gap-6.mb-6, #detailed-results button.text-sm.text-gray-500');
+        const originalDisplayStates = [];
+        elementsToHide.forEach(el => {
+            originalDisplayStates.push(el.style.display);
+            el.style.display = 'none';
+        });
+
+        // Temporarily remove the border from the Color Vision Analysis section
+        const colorVisionDivs = document.querySelectorAll('#detailed-results .border-t.pt-6');
+        const originalClassLists = [];
+        colorVisionDivs.forEach(div => {
+            originalClassLists.push(div.className);
+            div.classList.remove('border-t');
+            div.style.paddingTop = '1.5rem'; // Re-add padding that was removed with the border
+        });
+
+        // Temporarily adjust body for better PDF rendering
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        const spinner = document.createElement('div');
+        spinner.innerHTML = '<div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] text-white flex-col"><div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div><p class="text-lg">Generating PDF...</p></div>';
+        document.body.appendChild(spinner);
+
+        try {
+            // Use html2canvas to render the results section
+            const canvas = await html2canvas(resultsSection, { 
+                scale: 2, // Increase scale for better quality
+                useCORS: true // Required for some image sources if any
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            const imgWidth = 210; // A4 width in mm
+            const pageHeight = 297; // A4 height in mm
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // The endmatter has already been removed in a previous query
+            
+            doc.save(`design-lady-palette-analysis-${new Date().toISOString().split('T')[0]}.pdf`);
+            showToast('Analysis exported successfully!', 'success');
+        } catch (error) {
+            showToast('Error generating PDF.', 'error');
+            console.error("PDF generation failed:", error);
+        } finally {
+            // Restore the original content and styles
+            elementsToHide.forEach((el, index) => {
+                el.style.display = originalDisplayStates[index];
+            });
+            colorVisionDivs.forEach((div, index) => {
+                div.className = originalClassLists[index];
+            });
+            document.body.style.overflow = originalOverflow;
+            spinner.remove();
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        const bgClass = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-gray-800';
+        
+        toast.className = `${bgClass} text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300`;
+        toast.textContent = message;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        setTimeout(() => toast.classList.remove('translate-x-full'), 100);
+        setTimeout(() => {
+            toast.classList.add('translate-x-full');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function updateProgress() {
+        const inputs = document.querySelectorAll('#color-inputs input[type="text"]');
+        const validColors = Array.from(inputs).filter(input => hexToRgb(input.value)).length;
+        const progress = Math.min((validColors / 5) * 100, 100);
+        
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+        document.getElementById('progress-text').textContent = `${Math.round(progress)}% Complete`;
+    }
+
+    function addColorInput(color = '#FFFFFF', label = 'Custom Color') {
+        const colorInputs = document.getElementById('color-inputs');
+        const newInput = document.createElement('div');
+        newInput.className = 'color-input-group p-4 slide-up';
+        
+        newInput.innerHTML = `
+            <div class="flex items-center space-x-4">
+                <input type="color" value="${color}" class="w-16 h-16 rounded-xl border-0 cursor-pointer shadow-lg">
+                <div class="flex-1">
+                    <input type="text" value="${color}" maxlength="7" class="w-full text-lg font-mono font-semibold text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none uppercase" placeholder="#000000">
+                    <p class="text-sm text-gray-500 mt-1">${label}</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button class="copy-btn p-2 text-gray-400 hover:text-purple-600 transition-colors duration-200" title="Copy hex code">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <button class="remove-btn p-2 text-gray-400 hover:text-red-500 transition-colors duration-200" title="Remove color">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        colorInputs.appendChild(newInput);
+        updateRemoveButtonVisibility();
+        updateProgress();
+    }
+
+    function updateRemoveButtonVisibility() {
+        const removeButtons = document.querySelectorAll('.remove-btn');
+        removeButtons.forEach((btn, index) => {
+            btn.style.opacity = removeButtons.length > 2 ? '1' : '0';
+        });
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Copied to clipboard!', 'success');
+        });
+    }
+
+    function updateStickyPreview(colors) {
+        const stickyPreview = document.getElementById('sticky-preview');
+        const stickyContent = document.getElementById('sticky-preview-content');
+        
+        if (colors.length < 2) {
+            stickyPreview.classList.add('hidden');
+            return;
+        }
+        
+        let previewHTML = '';
+        let previewCount = 0;
+        
+        for (let i = 0; i < colors.length && previewCount < 3; i++) {
+            for (let j = i + 1; j < colors.length && previewCount < 3; j++) {
+                const color1 = hexToRgb(colors[i]);
+                const color2 = hexToRgb(colors[j]);
+                const ratio = getContrastRatio(color1, color2);
+                
+                const badgeClass = ratio >= 7 ? 'bg-green-500' : ratio >= 4.5 ? 'bg-yellow-500' : 'bg-red-500';
+                
+                previewHTML += `
+                    <div class="text-center">
+                        <div class="mb-2">
+                            <div class="text-lg font-bold p-3 rounded-lg" style="background-color: ${colors[j]}; color: ${colors[i]};">
+                                Sample Text
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center space-x-2 text-sm">
+                            <span class="w-3 h-3 ${badgeClass} rounded-full"></span>
+                            <span class="font-mono font-semibold">${ratio.toFixed(1)}:1</span>
+                        </div>
+                    </div>
+                `;
+                previewCount++;
+            }
+        }
+        
+        stickyContent.innerHTML = previewHTML;
+    }
+
+    function analyzeColors() {
+        const textInputs = document.querySelectorAll('#color-inputs input[type="text"]');
+        const colors = Array.from(textInputs).map(input => input.value).filter(color => hexToRgb(color));
+        
+        if (colors.length < 2) {
+            showToast('Add at least 2 colors to analyze', 'error');
+            return;
+        }
+
+        // Update sticky preview
+        updateStickyPreview(colors);
+
+        const resultsSection = document.getElementById('results-section');
+        const overviewStats = document.getElementById('overview-stats');
+        const detailedResults = document.getElementById('detailed-results');
+        
+        let totalPairs = 0;
+        let aaPassed = 0;
+        let aaaPassed = 0;
+        let resultsHTML = '';
+        
+        for (let i = 0; i < colors.length; i++) {
+            for (let j = i + 1; j < colors.length; j++) {
+                const color1 = hexToRgb(colors[i]);
+                const color2 = hexToRgb(colors[j]);
+                const ratio = getContrastRatio(color1, color2);
+                
+                totalPairs++;
+                if (ratio >= 4.5) aaPassed++;
+                if (ratio >= 7) aaaPassed++;
+                
+                const aaStatus = ratio >= 4.5;
+                const aaaStatus = ratio >= 7;
+                const badgeClass = aaaStatus ? 'accessibility-badge' : aaStatus ? 'warning-badge' : 'error-badge';
+                const statusText = aaaStatus ? 'AAA Excellent' : aaStatus ? 'AA Good' : 'Fail';
+                
+                // Get colorblindness feedback and simulations
+                const colorBlindnessInfo = generateColorBlindnessFeedback(colors[i], colors[j]);
+                
+                resultsHTML += `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border hover:shadow-lg transition-shadow duration-300">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-12 h-12 rounded-xl shadow-sm" style="background-color: ${colors[i]}"></div>
+                                    <div>
+                                        <p class="font-mono font-semibold text-gray-900">${colors[i]}</p>
+                                        <button class="text-sm text-gray-500 hover:text-purple-600" onclick="copyToClipboard('${colors[i]}')">Copy</button>
+                                    </div>
+                                </div>
+                                <div class="text-2xl text-gray-400">×</div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-12 h-12 rounded-xl shadow-sm" style="background-color: ${colors[j]}"></div>
+                                    <div>
+                                        <p class="font-mono font-semibold text-gray-900">${colors[j]}</p>
+                                        <button class="text-sm text-gray-500 hover:text-purple-600" onclick="copyToClipboard('${colors[j]}')">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold text-gray-900 mb-1">${ratio.toFixed(2)}</div>
+                                <div class="text-sm text-gray-500 mb-2">Contrast Ratio</div>
+                                <span class="${badgeClass} text-white px-3 py-1 rounded-full text-sm font-semibold">${statusText}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-6">
+                            <div class="text-center p-4 bg-gray-50 rounded-xl">
+                                <div class="text-2xl font-bold mb-2" style="background-color: ${colors[j]}; color: ${colors[i]}; padding: 0.5rem; border-radius: 0.5rem;">
+                                    Sample Text
+                                </div>
+                                <p class="text-sm text-gray-600">Text on Background</p>
+                            </div>
+                            <div class="text-center p-4 bg-gray-50 rounded-xl">
+                                <div class="text-2xl font-bold mb-2" style="background-color: ${colors[i]}; color: ${colors[j]}; padding: 0.5rem; border-radius: 0.5rem;">
+                                    Sample Text
+                                </div>
+                                <p class="text-sm text-gray-600">Reversed Colors</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-6">
+                            <div class="text-center">
+                                <div class="font-semibold text-gray-700 mb-2">Normal Text</div>
+                                <div class="${ratio >= 4.5 ? 'text-green-600' : 'text-red-600'} font-semibold">
+                                    ${ratio >= 4.5 ? '✓' : '✗'} ${ratio >= 4.5 ? 'Pass' : 'Fail'}
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-gray-700 mb-2">Large Text</div>
+                                <div class="${ratio >= 3 ? 'text-green-600' : 'text-red-600'} font-semibold">
+                                    ${ratio >= 3 ? '✓' : '✗'} ${ratio >= 3 ? 'Pass' : 'Fail'}
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-gray-700 mb-2">UI Components</div>
+                                <div class="${ratio >= 3 ? 'text-green-600' : 'text-red-600'} font-semibold">
+                                    ${ratio >= 3 ? '✓' : '✗'} ${ratio >= 3 ? 'Pass' : 'Fail'}
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="font-semibold text-gray-700 mb-2">Graphics</div>
+                                <div class="${ratio >= 3 ? 'text-green-600' : 'text-red-600'} font-semibold">
+                                    ${ratio >= 3 ? '✓' : '✗'} ${ratio >= 3 ? 'Pass' : 'Fail'}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Color Vision Analysis -->
+                        <div class="border-t pt-6">
+                            <h4 class="font-semibold text-gray-900 mb-4">Color Vision Analysis</h4>
+                            
+                            <!-- Feedback -->
+                            <div class="p-4 rounded-lg ${colorBlindnessInfo.feedbackClass} mb-4">
+                                <p class="font-medium">${colorBlindnessInfo.feedback.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>
+                            </div>
+                            
+                            <!-- Visual Simulations -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center">
+                                    <p class="font-semibold text-gray-700 mb-2 text-sm">Normal Vision</p>
+                                    <div class="flex justify-center space-x-1">
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colors[i]}"></div>
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colors[j]}"></div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-semibold text-gray-700 mb-2 text-sm">Protanopia</p>
+                                    <div class="flex justify-center space-x-1">
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.protanopia.color1}"></div>
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.protanopia.color2}"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">${colorBlindnessInfo.simulations.protanopia.contrast.toFixed(1)}:1</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-semibold text-gray-700 mb-2 text-sm">Deuteranopia</p>
+                                    <div class="flex justify-center space-x-1">
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.deuteranopia.color1}"></div>
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.deuteranopia.color2}"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">${colorBlindnessInfo.simulations.deuteranopia.contrast.toFixed(1)}:1</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="font-semibold text-gray-700 mb-2 text-sm">Tritanopia</p>
+                                    <div class="flex justify-center space-x-1">
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.tritanopia.color1}"></div>
+                                        <div class="w-8 h-8 rounded border" style="background-color: ${colorBlindnessInfo.simulations.tritanopia.color2}"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">${colorBlindnessInfo.simulations.tritanopia.contrast.toFixed(1)}:1</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Update overview stats
+        const aaPercentage = Math.round((aaPassed / totalPairs) * 100);
+        const aaaPercentage = Math.round((aaaPassed / totalPairs) * 100);
+        
+        overviewStats.innerHTML = `
+            <div class="bg-white rounded-2xl p-6 shadow-sm border text-center">
+                <div class="text-3xl font-bold text-gray-900 mb-2">${totalPairs}</div>
+                <p class="text-gray-600">Total Combinations</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border text-center">
+                <div class="text-3xl font-bold text-green-600 mb-2">${aaPercentage}%</div>
+                <p class="text-gray-600">AA Compliant</p>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border text-center">
+                <div class="text-3xl font-bold text-purple-600 mb-2">${aaaPercentage}%</div>
+                <p class="text-gray-600">AAA Compliant</p>
+            </div>
+        `;
+        
+        detailedResults.innerHTML = resultsHTML;
+        resultsSection.classList.remove('hidden');
+        document.getElementById('export-fab').classList.remove('hidden');
+        
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        
+        const message = aaPercentage === 100 ? 'Perfect! All combinations are accessible.' : 
+                       aaPercentage >= 80 ? 'Great! Most combinations are accessible.' : 
+                       'Consider adjusting colors for better accessibility.';
+        showToast(message, aaPercentage >= 80 ? 'success' : 'info');
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        updateRemoveButtonVisibility();
+        updateProgress();
+        
+        // Scroll functionality for sticky preview
+        let lastScrollTop = 0;
+        const stickyPreview = document.getElementById('sticky-preview');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const resultsSection = document.getElementById('results-section');
+            
+            if (resultsSection && !resultsSection.classList.contains('hidden')) {
+                const resultsRect = resultsSection.getBoundingClientRect();
+                
+                // Show sticky preview when results are visible but scrolled past
+                if (resultsRect.top < -100 && scrollTop > lastScrollTop) {
+                    stickyPreview.classList.remove('hidden');
+                    stickyPreview.classList.remove('-translate-y-full');
+                } else if (resultsRect.top > -50 || scrollTop < lastScrollTop) {
+                    stickyPreview.classList.add('-translate-y-full');
+                }
+            }
+            
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+        
+        // Close sticky preview
+        document.getElementById('close-preview').addEventListener('click', () => {
+            stickyPreview.classList.add('hidden');
+        });
+        
+        // Add color button
+        document.getElementById('add-color-btn').addEventListener('click', () => {
+            addColorInput();
+        });
+        
+        // Load brand colors
+        document.getElementById('load-brand-colors').addEventListener('click', () => {
+            const brandColors = ['#36069A', '#DE6399', '#020C28', '#F8F9FA', '#212529'];
+            const colorInputs = document.getElementById('color-inputs');
+            colorInputs.innerHTML = '';
+            
+            brandColors.forEach((color, index) => {
+                const labels = ['Primary Brand', 'Secondary Brand', 'Accent', 'Light Neutral', 'Dark Neutral'];
+                addColorInput(color, labels[index]);
+            });
+            
+            showToast('Brand palette loaded!', 'success');
+        });
+        
+        // Analyze button
+        document.getElementById('analyze-btn').addEventListener('click', analyzeColors);
+        
+        // Event delegation for dynamic elements
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.copy-btn')) {
+                const input = e.target.closest('.color-input-group').querySelector('input[type="text"]');
+                copyToClipboard(input.value);
+            }
+            
+            if (e.target.closest('.remove-btn')) {
+                e.target.closest('.color-input-group').remove();
+                updateRemoveButtonVisibility();
+                updateProgress();
+            }
+        });
+        
+        // Input synchronization and validation
+        document.addEventListener('input', (e) => {
+            if (e.target.type === 'color' || e.target.type === 'text') {
+                const group = e.target.closest('.color-input-group');
+                const colorInput = group.querySelector('input[type="color"]');
+                const textInput = group.querySelector('input[type="text"]');
+                
+                if (e.target.type === 'color') {
+                    textInput.value = e.target.value.toUpperCase();
+                } else {
+                    const hex = e.target.value.toUpperCase();
+                    if (hexToRgb(hex)) {
+                        colorInput.value = hex;
+                        e.target.value = hex;
+                    }
+                }
+                
+                updateProgress();
+                
+                // Update sticky preview in real-time
+                const textInputs = document.querySelectorAll('#color-inputs input[type="text"]');
+                const colors = Array.from(textInputs).map(input => input.value).filter(color => hexToRgb(color));
+                if (colors.length >= 2 && !document.getElementById('results-section').classList.contains('hidden')) {
+                    updateStickyPreview(colors);
+                }
+            }
+        });
+        
+        // Focus states
+        document.addEventListener('focusin', (e) => {
+            const group = e.target.closest('.color-input-group');
+            if (group) group.classList.add('focused');
+        });
+        
+        document.addEventListener('focusout', (e) => {
+            const group = e.target.closest('.color-input-group');
+            if (group) group.classList.remove('focused');
+        });
+    });
+</script>
+</body>
+</html>
