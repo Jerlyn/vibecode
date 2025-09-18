@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChatGPT Usage</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+      flex-direction: column;
+    }
+    h1 {
+      text-align: center;
+      margin: 20px;
+    }
+    #myDiv {
+      width: 100%;
+      max-width: 900px; /* Limit chart size for better display on large screens */
+      height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <h1>What Are People Using ChatGPT For?</h1>
+  <div id="myDiv"></div>
+
+  <script>
+    var data = [{
+      values: [18.4, 10.6, 10.2, 8.5, 8.0, 5.7, 4.5, 4.5, 4.2, 4.2, 3.9, 3.6, 3.4, 2.1, 2.0, 1.9, 1.4, 1.1, 0.8, 0.6],
+      labels: [
+        'Specific Info',
+        'Edit / Critique Text',
+        'Tutoring / Teaching',
+        'How-To Advice',
+        'Personal Writing',
+        'Health, Fitness, Self Care, Beauty',
+        'Translation',
+        'Other / Unknown',
+        'Generate / Retrieve Media',
+        'Coding',
+        'Creative Ideation',
+        'Summaries',
+        'Mathematical Calculation & Data Analysis',
+        'Purchases & Products',
+        'Greetings & Chitchat',
+        'Relationships & Personal Reflection',
+        'Write Fiction',
+        'Creating Images',
+        'Cooking & Recipes',
+        'Analyze an Image'
+      ],
+      type: 'pie',
+      marker: {
+        // This color palette is chosen to follow WCAG Use of Color contrast and to be distinct
+        colors: [
+          '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+          '#aec7e8', '#ffbb78', '#98df8a', '#ff9896', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d', '#9edae5'
+        ]
+      },
+      textinfo: 'percent+label',
+      hoverinfo: 'label+percent',
+      automargin: true,
+      sort: false // Maintain the order as in the original chart
+    }];
+
+    var layout = {
+      title: {
+        text: 'Click to Toggle Visibility of Categories',
+        font: {
+          size: 24,
+          color: '#333'
+        }
+      },
+      showlegend: true, // Display the legend
+      legend: {
+        // Position the legend on the right
+        x: 1,
+        y: 1,
+        traceorder: 'normal',
+        font: {
+          family: 'sans-serif',
+          size: 12,
+          color: '#000'
+        },
+        bgcolor: '#E2E2E2',
+        bordercolor: '#FFFFFF',
+        borderwidth: 2
+      },
+      paper_bgcolor: '#f0f0f0',
+      plot_bgcolor: '#f0f0f0',
+      // Add accessible text for screen readers
+      'aria-label': 'Pie chart showing what people use ChatGPT for, with categories and their percentages.',
+      'aria-roledescription': 'An interactive pie chart.',
+    };
+
+    var config = {
+      responsive: true,
+      displayModeBar: true,
+      modeBarButtonsToRemove: ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'],
+      // Add accessibility for keyboard navigation
+      'displaylogo': false,
+      'staticPlot': false,
+      'editable': false
+    };
+
+    Plotly.newPlot('myDiv', data, layout, config);
+  </script>
+</body>
+</html>
