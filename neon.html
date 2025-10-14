@@ -65,16 +65,38 @@
             text-shadow: 0 0 4px #00FFFF, 0 0 8px #00FFFF; /* Neon Cyan shadow */
             color: #00FFFF;
         }
+        
+        /* Ensure touch events are handled by the script and don't cause scrolling/zooming */
+        #touchControlArea {
+            touch-action: none; 
+        }
     </style>
 </head>
-<body class="p-2 md:p-8">
+<body class="p-2 md:p-8 flex flex-col items-center justify-center min-h-screen">
 
-    <div id="app" class="flex flex-col items-center justify-center min-h-[90vh]">
-        <h1 class="text-5xl lg:text-7xl mb-6 neon-text text-center">PONG ARCADE</h1>
+    <div id="app" class="flex flex-col items-center justify-center w-full max-w-5xl">
+        <h1 class="text-5xl lg:text-7xl mb-4 neon-text text-center">PONG ARCADE</h1>
 
-        <!-- Arcade Screen Container -->
-        <div id="arcadeContainer" class="arcade-border w-[800px] h-[600px] max-w-full aspect-square" style="max-height: calc(100vh - 180px);">
+        <!-- Arcade Screen Container (Responsive) -->
+        <!-- Use aspect-square and dynamic max-height to fit well on mobile portrait screens -->
+        <div id="arcadeContainer" 
+             class="arcade-border w-full max-w-[800px] aspect-[4/3] mx-auto" 
+             style="max-height: 80vh;">
+            
             <canvas id="gameCanvas" width="800" height="600" class="w-full h-full"></canvas>
+
+            <!-- 
+                TOUCH CONTROL OVERLAY (Invisible) - Mobile UX
+                It takes up the left third of the screen where the player paddle is.
+                This area listens for touch events to move the paddle up/down. 
+            -->
+            <div id="touchControlArea" class="absolute left-0 top-0 bottom-0 w-1/3 lg:hidden">
+                <!-- Up Zone (Top Half) -->
+                <div id="touchUp" class="h-1/2 w-full"></div>
+                <!-- Down Zone (Bottom Half) -->
+                <div id="touchDown" class="h-1/2 w-full"></div>
+            </div>
+
 
             <!-- Overlay for start/pause/game over screen -->
             <div id="overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80" style="display: flex;">
@@ -82,14 +104,16 @@
                     <!-- Initial message set in JS -->
                 </p>
                 <button id="startButton" class="neon-button text-2xl px-8 py-4 rounded-lg">START GAME</button>
-                <p class="mt-8 text-xl text-white text-opacity-80 text-center px-4 leading-snug">
-                    Controls: Use <span class="neon-text">W</span> (Up) and <span class="neon-text">S</span> (Down) keys to move your paddle.
+                <p class="mt-8 text-lg text-white text-opacity-80 text-center px-4 leading-snug lg:text-xl">
+                    <!-- Instructions change based on device -->
+                    <span class="hidden lg:block">Controls: Use <span class="neon-text">W</span> (Up) and <span class="neon-text">S</span> (Down) keys to move your paddle.</span>
+                    <span class="lg:hidden">Controls: <span class="neon-text">TAP & HOLD</span> the left screen to move your paddle.</span>
                 </p>
             </div>
         </div>
 
         <!-- Scoreboard -->
-        <div class="mt-4 text-3xl flex justify-around w-full max-w-[800px] px-4">
+        <div class="mt-4 text-2xl md:text-3xl flex justify-around w-full max-w-[800px] px-4">
             <div class="score-display">PLAYER: <span id="playerScore">0</span></div>
             <div class="score-display">COMPUTER: <span id="cpuScore">0</span></div>
         </div>
@@ -280,11 +304,11 @@
         const keys = {};
 
         function handleInput(paddle) {
-            // Player controls (W/S)
-            if (keys['w'] || keys['W']) {
+            // Player controls (W/S) OR Touch input
+            if (keys['w'] || keys['W'] || keys['touchUp']) {
                 paddle.y -= paddle.speed;
             }
-            if (keys['s'] || keys['S']) {
+            if (keys['s'] || keys['S'] || keys['touchDown']) {
                 paddle.y += paddle.speed;
             }
 
@@ -375,6 +399,7 @@
 
             // Make the canvas responsive by adjusting width/height to container
             const container = document.getElementById('arcadeContainer');
+            // Recalculate dimensions based on the container size
             W = container.clientWidth;
             H = container.clientHeight;
             canvas.width = W;
@@ -382,9 +407,10 @@
 
             // Define game elements
             const paddleW = 15;
-            const paddleH = 120; // Extra large paddle for beginner-friendliness
-            const paddleXOffset = 20;
-            const ballR = 10;
+            // Scale paddle height based on canvas height for responsiveness
+            const paddleH = Math.max(80, H / 5); 
+            const paddleXOffset = W * 0.025; // 2.5% padding from the edge
+            const ballR = Math.max(5, W * 0.01); // Ball radius scales with width
 
             player = new Paddle(
                 paddleXOffset, H / 2 - paddleH / 2, paddleW, paddleH,
@@ -397,6 +423,7 @@
             ball = new Ball(W / 2, H / 2, ballR, '#00FF00'); // Neon Green
 
             setupSound(); // Setup sound synths
+            setupTouchControls(); // NEW: Setup mobile controls
             
             // Set initial message
             document.getElementById('message').innerHTML = 'WELCOME TO PONG ARCADE!<br><br>FIRST TO ' + maxScore + ' WINS!';
@@ -439,6 +466,73 @@
             overlay.style.display = 'flex';
         }
 
+
+        // --- Touch Control Setup for Mobile UX ---
+
+        function setupTouchControls() {
+            const touchControlArea = document.getElementById('touchControlArea');
+            
+            // Function to stop movement when touch is released or canceled
+            const handleTouchEnd = (e) => {
+                // We don't preventDefault here to allow tap-to-start (if not in game)
+                keys['touchUp'] = false;
+                keys['touchDown'] = false;
+            };
+            
+            // Only listen on the main control area for touch events
+            touchControlArea.addEventListener('touchstart', (e) => {
+                if (!gameStarted) {
+                    // If touch is detected outside the start button but game hasn't started, ignore it.
+                    return; 
+                }
+                
+                // Prevent scrolling/zoom while playing
+                e.preventDefault(); 
+                
+                // Get the y-coordinate of the first touch relative to the control area
+                const touch = e.touches[0];
+                const rect = touchControlArea.getBoundingClientRect();
+                const y = touch.clientY - rect.top; 
+                
+                // Determine if the touch is in the top or bottom half
+                if (y < rect.height / 2) {
+                    keys['touchUp'] = true;
+                    keys['touchDown'] = false;
+                } else {
+                    keys['touchDown'] = true;
+                    keys['touchUp'] = false;
+                }
+            }, { passive: false });
+
+            // Use touchmove to track where the active touch is currently located
+            touchControlArea.addEventListener('touchmove', (e) => {
+                if (!gameStarted || e.touches.length === 0) return;
+                
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const rect = touchControlArea.getBoundingClientRect();
+                const y = touch.clientY - rect.top; // y position relative to the control area
+                
+                if (y < rect.height / 2) {
+                    // Top half
+                    keys['touchUp'] = true;
+                    keys['touchDown'] = false;
+                } else {
+                    // Bottom half
+                    keys['touchDown'] = true;
+                    keys['touchUp'] = false;
+                }
+            }, { passive: false });
+            
+            // Stop movement when finger is lifted or the touch is canceled (e.g., incoming call)
+            touchControlArea.addEventListener('touchend', handleTouchEnd);
+            touchControlArea.addEventListener('touchcancel', handleTouchEnd);
+            
+            // Handle the Start Button separately for the first touch event (Tone.start)
+            document.getElementById('startButton').addEventListener('touchend', startGame);
+        }
+
         // --- Event Listeners ---
 
         window.onload = initGame;
@@ -448,7 +542,7 @@
 
         document.getElementById('startButton').addEventListener('click', startGame);
 
-        // Keyboard events for controls
+        // Keyboard events for controls (Still active for desktop users)
         document.addEventListener('keydown', (e) => {
             keys[e.key] = true;
             if (e.key === ' ' && !gameStarted) { // Space bar to start
