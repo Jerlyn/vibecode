@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Obafemi Jones - Portfolio Wireframe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        .sr-only:focus {
+            position: static;
+            width: auto;
+            height: auto;
+            padding: 0.5rem 1rem;
+            margin: 0;
+            overflow: visible;
+            clip: auto;
+            white-space: normal;
+        }
+        .page-content {
+            display: none;
+        }
+        .page-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-amber-500 focus:text-black focus:px-4 focus:py-2 focus:rounded">
+        Skip to main content
+    </a>
+
+    <nav class="bg-black text-white sticky top-0 z-40 border-b border-neutral-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold">John Obafemi Jones</h1>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <button data-page="home" class="nav-link text-sm font-medium transition-colors hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black px-2 py-1 rounded text-amber-400">Home</button>
+                    <button data-page="gallery" class="nav-link text-sm font-medium transition-colors hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black px-2 py-1 rounded text-neutral-300">Gallery</button>
+                    <button data-page="about" class="nav-link text-sm font-medium transition-colors hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black px-2 py-1 rounded text-neutral-300">About</button>
+                    <button data-page="provenance" class="nav-link text-sm font-medium transition-colors hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black px-2 py-1 rounded text-neutral-300">Provenance</button>
+                    <button data-page="contact" class="nav-link text-sm font-medium transition-colors hover:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black px-2 py-1 rounded text-neutral-300">Contact</button>
+                </div>
+
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-neutral-300 hover:text-white hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-amber-500" aria-label="Toggle menu">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <svg id="close-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="mobile-menu" class="md:hidden pb-4 space-y-2 hidden">
+                <button data-page="home" class="mobile-nav-link block w-full text-left px-3 py-2 rounded-md text-base font-medium bg-neutral-800 text-amber-400">Home</button>
+                <button data-page="gallery" class="mobile-nav-link block w-full text-left px-3 py-2 rounded-md text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white">Gallery</button>
+                <button data-page="about" class="mobile-nav-link block w-full text-left px-3 py-2 rounded-md text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white">About</button>
+                <button data-page="provenance" class="mobile-nav-link block w-full text-left px-3 py-2 rounded-md text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white">Provenance</button>
+                <button data-page="contact" class="mobile-nav-link block w-full text-left px-3 py-2 rounded-md text-base font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white">Contact</button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div id="home-page" class="page-content active space-y-8">
+            <section class="text-white p-8 rounded-lg" style="background-image: url('header.png'); background-size: cover; background-position: center; background-color: rgba(0, 0, 0, 0.6); background-blend-mode: darken;"> 
+                <div class="max-w-4xl mx-auto text-center space-y-6">
+                    <p class="text-sm uppercase tracking-widest text-neutral-400">Where the brush remembers</p>
+                    <h2 class="text-4xl md:text-5xl font-bold leading-tight">
+                        Expressionist Art for Cultural Legacy & Collectors
+                    </h2>
+                    <!--<p class="text-xl text-neutral-300 max-w-2xl mx-auto">
+                        Own a one-of-a-kind painting that bridges heritage, resilience, and story.
+                    </p>-->
+                    <button class="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-md transition-colors">
+                        View Available Works
+                    </button>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold text-center">Featured Work</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-neutral-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div class="aspect-square bg-neutral-300 flex items-center justify-center">
+                            <span class="text-neutral-500"><img src="art.png"></span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-semibold text-lg">Artwork Title 1</h3>
+                            <p class="text-sm text-neutral-600">2025 | 36" x 48" | Acrylic on canvas</p>
+                            <span class="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                    </div>
+                    <div class="bg-neutral-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div class="aspect-square bg-neutral-300 flex items-center justify-center">
+                            <span class="text-neutral-500"><img src="art1.png"></span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-semibold text-lg">Artwork Title 2</h3>
+                            <p class="text-sm text-neutral-600">2025 | 36" x 48" | Acrylic on canvas</p>
+                            <span class="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                    </div>
+                    <div class="bg-neutral-100 rounded-lg overflow-hidden group cursor-pointer">
+                        <div class="aspect-square bg-neutral-300 flex items-center justify-center">
+                            <span class="text-neutral-500"><img src="art2.png"></span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-semibold text-lg">Artwork Title 3</h3>
+                            <p class="text-sm text-neutral-600">2025 | 36" x 48" | Acrylic on canvas</p>
+                            <span class="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <button data-page="gallery" class="page-nav text-neutral-700 font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all">
+                        View Full Gallery 
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <section class="bg-neutral-50 p-8 rounded-lg">
+                <div class="max-w-3xl mx-auto text-center space-y-4">
+                    <h2 class="text-2xl font-bold">The Vision Behind the Work</h2>
+                    <p class="text-lg text-neutral-700">
+                        I channel the rhythms of the Diaspora, painting stories that pulse with history and humanity. 
+                        Each piece is an exploration of memory, forging connections between the past and the present.
+                    </p>
+                    <button data-page="about" class="page-nav text-neutral-700 font-semibold inline-flex items-center gap-2 hover:gap-3 transition-all">
+                        Learn More About the Artist
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <section class="bg-neutral-900 text-white p-8 rounded-lg">
+                <div class="max-w-2xl mx-auto text-center space-y-6">
+                    <h2 class="text-3xl font-bold">Collect Cultural Legacy</h2>
+                    <p class="text-lg text-neutral-300">
+                        Join discerning collectors who understand the power of art that echoes across generations.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button class="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-6 py-3 rounded-md transition-colors">
+                            Inquire About Available Works
+                        </button>
+                        <button class="border-2 border-white hover:bg-white hover:text-black text-white font-semibold px-6 py-3 rounded-md transition-colors">
+                            Commission Original Work
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="gallery-page" class="page-content space-y-6">
+            <div class="space-y-4">
+                <h2 class="text-4xl font-bold">Gallery</h2>
+                <p class="text-lg text-neutral-600">Curated works for the discerning collector</p>
+            </div>
+
+            <div class="bg-neutral-50 p-6 rounded-lg space-y-4">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <label for="search" class="sr-only">Search artworks</label>
+                        <div class="relative">
+                            <svg class="absolute left-3 top-3 text-neutral-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input
+                                id="search"
+                                type="text"
+                                placeholder="Search by title, series, or theme"
+                                class="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                        </div>
+                    </div>
+                    <button class="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-300 rounded-md hover:bg-neutral-50">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Filters
+                    </button>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button class="px-4 py-2 bg-amber-500 text-black rounded-full text-sm font-semibold">All Works</button>
+                    <button class="px-4 py-2 bg-white border border-neutral-300 rounded-full text-sm hover:bg-neutral-50">Available</button>
+                    <button class="px-4 py-2 bg-white border border-neutral-300 rounded-full text-sm hover:bg-neutral-50">Sold</button>
+                    <button class="px-4 py-2 bg-white border border-neutral-300 rounded-full text-sm hover:bg-neutral-50">Diaspora Series</button>
+                    <button class="px-4 py-2 bg-white border border-neutral-300 rounded-full text-sm hover:bg-neutral-50">2025</button>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500"><img src="art.png"></span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 1</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2025 | 36" x 48"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500"><img src="art2.png"></span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 2</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2025 | 36" x 48"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500"><img src="art3.png"></span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 3</h3>
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Sold</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2024 | 24" x 36"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500"><img src="art2.png"></span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 4</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2025 | 48" x 60"</p>
+                        <p class="text-sm text-neutral-600">Mixed media</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500">[Artwork 5]</span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 5</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2025 | 36" x 48"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500">[Artwork 6]</span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 6</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2024 | 30" x 40"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500">[Artwork 7]</span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 7</h3>
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Sold</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2024 | 36" x 48"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <div class="aspect-square bg-neutral-200 flex items-center justify-center">
+                        <span class="text-neutral-500">[Artwork 8]</span>
+                    </div>
+                    <div class="p-4 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h3 class="font-semibold">Title 8</h3>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Available</span>
+                        </div>
+                        <p class="text-sm text-neutral-600">2025 | 36" x 48"</p>
+                        <p class="text-sm text-neutral-600">Acrylic on canvas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center gap-2 pt-4">
+                <button class="px-4 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50">Previous</button>
+                <button class="px-4 py-2 bg-amber-500 text-black rounded-md font-semibold">1</button>
+                <button class="px-4 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50">2</button>
+                <button class="px-4 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50">3</button>
+                <button class="px-4 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50">Next</button>
+            </div>
+        </div>
+
+        <div id="about-page" class="page-content space-y-12">
+            <section class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="aspect-square bg-neutral-200 rounded-lg flex items-center justify-center">
+                    <span class="text-neutral-500"><img src="jones.png"></span>
+                </div>
+                <div class="space-y-4">
+                    <h2 class="text-4xl font-bold">John Obafemi Jones</h2>
+                    <p class="text-xl text-neutral-600">Expressionist painter channeling the rhythms of the Diaspora</p>
+                    <p class="text-neutral-700 leading-relaxed">
+                        My paintings don't just speak (they echo across generations). They belong where legacy lives and 
+                        souls linger (in the world's great museums and in the sacred spaces we call home).
+                    </p>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">Biography</h2>
+                <div class="prose max-w-none">
+                    <p class="text-neutral-700 leading-relaxed">
+                        [Artist biography content goes here. Include formative experiences, artistic journey, 
+                        influences, and what drives the work. This should be 3-4 paragraphs that tell a compelling story.]
+                    </p>
+                </div>
+            </section>
+
+            <section class="bg-neutral-50 p-8 rounded-lg space-y-6">
+                <h2 class="text-3xl font-bold">Artistic Approach</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <h3 class="text-xl font-semibold">Materials & Process</h3>
+                        <p class="text-neutral-700">
+                            [Description of materials used (acrylics, fibers, canvas), techniques, 
+                            and the physical process of creating each work]
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <h3 class="text-xl font-semibold">Themes & Inspiration</h3>
+                        <p class="text-neutral-700">
+                            [Core themes explored: memory, Diaspora, cultural legacy, connection between 
+                            past and present, stories of resilience]
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">Exhibitions & Recognition</h2>
+                <div class="space-y-4">
+                    <div class="border-l-4 border-amber-500 pl-4 py-2">
+                        <p class="font-semibold">Solo Exhibition Title</p>
+                        <p class="text-sm text-neutral-600">Gallery Name, City | 2025</p>
+                    </div>
+                    <div class="border-l-4 border-amber-500 pl-4 py-2">
+                        <p class="font-semibold">Group Show Title</p>
+                        <p class="text-sm text-neutral-600">Museum Name, City | 2024</p>
+                    </div>
+                    <div class="border-l-4 border-amber-500 pl-4 py-2">
+                        <p class="font-semibold">Art Fair Presentation</p>
+                        <p class="text-sm text-neutral-600">Fair Name, City | 2024</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">Press</h2>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white p-6 rounded-lg border border-neutral-200">
+                        <p class="text-sm text-neutral-500 mb-2">[Publication Name] | [Date]</p>
+                        <h3 class="font-semibold mb-2">[Article Headline]</h3>
+                        <a href="#" class="text-amber-600 hover:text-amber-700 text-sm font-semibold">Read Article →</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-neutral-200">
+                        <p class="text-sm text-neutral-500 mb-2">[Publication Name] | [Date]</p>
+                        <h3 class="font-semibold mb-2">[Article Headline]</h3>
+                        <a href="#" class="text-amber-600 hover:text-amber-700 text-sm font-semibold">Read Article →</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-neutral-200">
+                        <p class="text-sm text-neutral-500 mb-2">[Publication Name] | [Date]</p>
+                        <h3 class="font-semibold mb-2">[Article Headline]</h3>
+                        <a href="#" class="text-amber-600 hover:text-amber-700 text-sm font-semibold">Read Article →</a>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-neutral-200">
+                        <p class="text-sm text-neutral-500 mb-2">[Publication Name] | [Date]</p>
+                        <h3 class="font-semibold mb-2">[Article Headline]</h3>
+                        <a href="#" class="text-amber-600 hover:text-amber-700 text-sm font-semibold">Read Article →</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-neutral-900 text-white p-8 rounded-lg text-center space-y-4">
+                <h2 class="text-2xl font-bold">Interested in Learning More?</h2>
+                <button data-page="contact" class="page-nav bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-md transition-colors">
+                    Get in Touch
+                </button>
+            </section>
+        </div>
+
+        <div id="provenance-page" class="page-content space-y-12">
+            <section class="text-center space-y-4">
+                <h2 class="text-4xl font-bold">Provenance & Collecting</h2>
+                <p class="text-xl text-neutral-600 max-w-3xl mx-auto">
+                    Powerful works for collectors of culture and legacy
+                </p>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">Why Collect This Work</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-neutral-50 p-6 rounded-lg space-y-3">
+                        <h3 class="text-xl font-semibold">Cultural Significance</h3>
+                        <p class="text-neutral-700">
+                            Works that capture and preserve stories of the Diaspora, heritage, and collective memory.
+                        </p>
+                    </div>
+                    <div class="bg-neutral-50 p-6 rounded-lg space-y-3">
+                        <h3 class="text-xl font-semibold">Museum-Quality Work</h3>
+                        <p class="text-neutral-700">
+                            Each piece is created with archival materials and techniques suitable for institutional collections.
+                        </p>
+                    </div>
+                    <div class="bg-neutral-50 p-6 rounded-lg space-y-3">
+                        <h3 class="text-xl font-semibold">Legacy Investment</h3>
+                        <p class="text-neutral-700">
+                            Art that appreciates in cultural and financial value as the artist's recognition grows.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-neutral-50 p-8 rounded-lg space-y-6">
+                <h2 class="text-3xl font-bold">Provenance Documentation</h2>
+                <p class="text-neutral-700 leading-relaxed">
+                    Every work comes with complete provenance documentation to ensure authenticity and protect your investment:
+                </p>
+                <ul class="space-y-3 text-neutral-700">
+                    <li class="flex gap-3">
+                        <span class="text-amber-500 font-bold">✓</span>
+                        <span>Certificate of Authenticity signed by the artist</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-amber-500 font-bold">✓</span>
+                        <span>Detailed artwork documentation (title, date, dimensions, materials)</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-amber-500 font-bold">✓</span>
+                        <span>Photographic documentation of the work</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-amber-500 font-bold">✓</span>
+                        <span>Artist statement about the specific piece</span>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-amber-500 font-bold">✓</span>
+                        <span>Care and conservation guidelines</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">Care & Conservation</h2>
+                <div class="bg-white border border-neutral-200 p-6 rounded-lg space-y-4">
+                    <h3 class="text-xl font-semibold">Preserving Your Investment</h3>
+                    <div class="grid md:grid-cols-2 gap-6 text-neutral-700">
+                        <div class="space-y-2">
+                            <h4 class="font-semibold">Display Recommendations</h4>
+                            <ul class="space-y-1 text-sm">
+                                <li>• Avoid direct sunlight</li>
+                                <li>• Maintain stable temperature (65-75°F)</li>
+                                <li>• Keep humidity levels 45-55%</li>
+                                <li>• Use UV-protective glazing if framing</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="font-semibold">Maintenance</h4>
+                            <ul class="space-y-1 text-sm">
+                                <li>• Dust gently with soft brush</li>
+                                <li>• Never use cleaning solutions</li>
+                                <li>• Professional cleaning when needed</li>
+                                <li>• Document any conservation work</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <h2 class="text-3xl font-bold">What Collectors Say</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-neutral-50 p-6 rounded-lg space-y-4">
+                        <p class="text-neutral-700 italic">
+                            "[Testimonial quote about the power of the work, the collecting experience, 
+                            and the value it brings to their collection or space]"
+                        </p>
+                        <div>
+                            <p class="font-semibold">[Collector Name]</p>
+                            <p class="text-sm text-neutral-600">[Location/Institution]</p>
+                        </div>
+                    </div>
+                    <div class="bg-neutral-50 p-6 rounded-lg space-y-4">
+                        <p class="text-neutral-700 italic">
+                            "[Testimonial quote about the power of the work, the collecting experience, 
+                            and the value it brings to their collection or space]"
+                        </p>
+                        <div>
+                            <p class="font-semibold">[Collector Name]</p>
+                            <p class="text-sm text-neutral-600">[Location/Institution]</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-neutral-900 text-white p-8 rounded-lg text-center space-y-6">
+                <h2 class="text-3xl font-bold">Begin Your Collection</h2>
+                <p class="text-lg text-neutral-300 max-w-2xl mx-auto">
+                    Limited works available. Inquire today about available pieces or commission opportunities.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button data-page="gallery" class="page-nav bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-md transition-colors">
+                        View Available Works
+                    </button>
+                    <button data-page="contact" class="page-nav border-2 border-white hover:bg-white hover:text-black text-white font-semibold px-8 py-3 rounded-md transition-colors">
+                        Inquire About Commissions
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div id="contact-page" class="page-content max-w-4xl mx-auto space-y-12">
+            <section class="text-center space-y-4">
+                <h2 class="text-4xl font-bold">Get in Touch</h2>
+                <p class="text-xl text-neutral-600">
+                    Inquiries about available works, commissions, exhibitions, and press
+                </p>
+            </section>
+
+            <section class="bg-white border border-neutral-200 p-8 rounded-lg space-y-6">
+                <form class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="firstName" class="block font-semibold text-sm">First Name *</label>
+                            <input
+                                id="firstName"
+                                type="text"
+                                required
+                                class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                        </div>
+                        <div class="space-y-2">
+                            <label for="lastName" class="block font-semibold text-sm">Last Name *</label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                required
+                                class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="email" class="block font-semibold text-sm">Email Address *</label>
+                        <input
+                            id="email"
+                            type="email"
+                            required
+                            class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="phone" class="block font-semibold text-sm">Phone Number</label>
+                        <input
+                            id="phone"
+                            type="tel"
+                            class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="inquiryType" class="block font-semibold text-sm">Inquiry Type *</label>
+                        <select
+                            id="inquiryType"
+                            required
+                            class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        >
+                            <option value="">Select inquiry type</option>
+                            <option value="purchase">Purchase Available Work</option>
+                            <option value="commission">Commission Inquiry</option>
+                            <option value="exhibition">Exhibition Opportunity</option>
+                            <option value="press">Press/Media Request</option>
+                            <option value="general">General Inquiry</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="message" class="block font-semibold text-sm">Message *</label>
+                        <textarea
+                            id="message"
+                            rows="6"
+                            required
+                            placeholder="Please provide details about your inquiry"
+                            class="w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        ></textarea>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="flex items-start gap-3">
+                            <input
+                                type="checkbox"
+                                class="mt-1 w-4 h-4 border-neutral-300 rounded focus:ring-2 focus:ring-amber-500"
+                            />
+                            <span class="text-sm text-neutral-700">
+                                I would like to receive updates about new works and exhibitions
+                            </span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-black font-semibold px-8 py-3 rounded-md transition-colors">
+                        Send Inquiry
+                    </button>
+
+                    <p class="text-sm text-neutral-600 text-center">
+                        Response time: Within 48 hours (business days)
+                    </p>
+                </form>
+            </section>
+
+            <section class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="space-y-2">
+                    <h3 class="font-semibold">Email & Tel</h3>
+                    <p class="text-neutral-600 text-sm">jobafemi@gmail.com <br>Tel: 340-690-6614
+                    </p>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-semibold">Instagram</h3>
+                    <p class="text-neutral-600 text-sm">@johnobafemiartist</p>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-semibold">Mailing</h3>
+                    <p class="text-neutral-600 text-sm">P.O. Box 3554 Frederiksted VI 00841-3554 -3660</p>
+                </div>
+            </section>
+
+            <section class="bg-neutral-50 p-8 rounded-lg text-center space-y-4">
+                <h2 class="text-2xl font-bold">Schedule a Private Viewing</h2>
+                <p class="text-neutral-700">
+                    Serious collectors are welcome to schedule a private studio visit to view works in person.
+                </p>
+                <button class="bg-neutral-900 hover:bg-neutral-800 text-white font-semibold px-6 py-3 rounded-md transition-colors">
+                    Request Studio Visit
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-neutral-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <h3 class="font-bold text-lg">John Obafemi Jones</h3>
+                    <p class="text-sm text-neutral-400">
+                        Expressionist art for cultural legacy and collectors
+                    </p>
+                </div>
+                <div class="space-y-3">
+                    <h4 class="font-semibold">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="#" data-page="gallery" class="page-nav hover:text-amber-400 transition-colors">Gallery</a></li>
+                        <li><a href="#" data-page="about" class="page-nav hover:text-amber-400 transition-colors">About</a></li>
+                        <li><a href="#" data-page="provenance" class="page-nav hover:text-amber-400 transition-colors">Provenance</a></li>
+                        <li><a href="#" data-page="contact" class="page-nav hover:text-amber-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h4 class="font-semibold">For Collectors</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="#" data-page="gallery" class="page-nav hover:text-amber-400 transition-colors">Available Works</a></li>
+                        <li><a href="#" data-page="contact" class="page-nav hover:text-amber-400 transition-colors">Commission Info</a></li>
+                        <li><a href="#" data-page="provenance" class="page-nav hover:text-amber-400 transition-colors">Care Guidelines</a></li>
+                        <li><a href="#" data-page="contact" class="page-nav hover:text-amber-400 transition-colors">Private Viewings</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-3">
+                    <h4 class="font-semibold">Connect</h4>
+                    <ul class="space-y-2 text-sm text-neutral-400">
+                        <li><a href="#" class="hover:text-amber-400 transition-colors">Instagram</a></li>
+                        <li><a href="#" class="hover:text-amber-400 transition-colors">LinkedIn</a></li>
+                        <li><a href="#" class="hover:text-amber-400 transition-colors">Email Updates</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-neutral-800 mt-8 pt-8 text-center text-sm text-neutral-500">
+                <p>© 2025 John Obafemi Jones. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-4 right-4 bg-amber-500 text-black px-4 py-2 rounded-lg shadow-lg text-sm font-semibold z-50">
+        Interactive Wireframe
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            const selectedPage = document.getElementById(pageId + '-page');
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-amber-400');
+                link.classList.add('text-neutral-300');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('text-amber-400');
+                    link.classList.remove('text-neutral-300');
+                }
+            });
+            
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.classList.remove('bg-neutral-800', 'text-amber-400');
+                link.classList.add('text-neutral-300');
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('bg-neutral-800', 'text-amber-400');
+                    link.classList.remove('text-neutral-300');
+                }
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+            
+            mobileMenu.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+        
+        document.getElementById('mobile-menu-button').addEventListener('click', toggleMobileMenu);
+        
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.getAttribute('data-page'));
+            });
+        });
+        
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.getAttribute('data-page'));
+                toggleMobileMenu();
+            });
+        });
+        
+        document.querySelectorAll('.page-nav').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.getAttribute('data-page'));
+            });
+        });
+    </script>
+</body>
+</html>
