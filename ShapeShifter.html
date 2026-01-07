@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Morphing Orb</title>
+    <style>
+        /* --- CSS Reset & Base Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #111111; /* Neutral Black Background */
+            color: #FFFFFF;
+        }
+
+        /* --- 3D Canvas Container --- */
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* --- UI Overlay (Glassmorphism) --- */
+        #ui-layer {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            width: 90%;
+            max-width: 600px;
+            pointer-events: none; /* Let clicks pass through to canvas where not on UI */
+        }
+
+        .controls-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1.5rem 2rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .controls-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #ADB5BD; /* Neutral */
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        /* --- Color Swatch Navigation --- */
+        .color-nav {
+            display: flex;
+            gap: 0.8rem;
+            list-style: none;
+            flex-wrap: wrap; /* Allow wrapping for many characters */
+            justify-content: center;
+        }
+
+        .swatch-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
+            position: relative;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background-color: transparent; /* Use generic background */
+        }
+
+        .swatch-btn::after {
+            content: '';
+            position: absolute;
+            top: -4px; right: -4px; bottom: -4px; left: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .swatch-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .swatch-btn:focus-visible::after {
+            border-color: #FFFFFF;
+        }
+
+        .swatch-btn.active {
+            transform: scale(1.1);
+            border-color: #FFFFFF;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        /* --- Character Colors (Manual Override) --- */
+        /* Note: Update these hex codes to match your exact images */
+        .btn-red { background-color: #FF4136; color: #FF4136; }
+        .btn-orange { background-color: #FF851B; color: #FF851B; }
+        .btn-yellow { background-color: #FFDC00; color: #FFDC00; }
+        .btn-green { background-color: #2ECC40; color: #2ECC40; }
+        .btn-blue { background-color: #0074D9; color: #0074D9; }
+        .btn-purple { background-color: #B10DC9; color: #B10DC9; }
+
+        /* Emoji Text inside button */
+        .swatch-btn span {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            pointer-events: none;
+        }
+
+        /* --- Introduction Text --- */
+        .intro-text {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-out forwards 0.5s;
+        }
+
+        .intro-text h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFFFFF 0%, #ADB5BD 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .intro-text p {
+            color: #ADB5BD;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* --- Mobile Responsiveness --- */
+        @media (max-width: 768px) {
+            .controls-card {
+                width: 95%;
+                padding: 1rem;
+            }
+            .swatch-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+            .intro-text h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    
+    <!-- Import Maps for Three.js and GSAP -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+                "gsap": "https://unpkg.com/gsap@3.12.5/index.js"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- 3D Scene -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div class="intro-text">
+        <h2>Shape Shifter</h2>
+        <p>Select a color to reshape the entity.</p>
+    </div>
+
+    <div id="ui-layer">
+        <div class="controls-card">
+            <h1>Character Palette</h1>
+            <nav class="color-nav" role="tablist" aria-label="Character Selection">
+                <!-- 
+                     Note: I've added Emojis to represent "Characters". 
+                     You can replace the emojis (inside <span>) and data-color hex codes 
+                     to exactly match the files you uploaded.
+                -->
+                <button class="swatch-btn btn-red active" data-color="#FF4136" aria-label="Morph to Red Character" aria-selected="true" role="tab">
+                    <span>👹</span>
+                </button>
+                <button class="swatch-btn btn-orange" data-color="#FF851B" aria-label="Morph to Orange Character" aria-selected="false" role="tab">
+                    <span>🦊</span>
+                </button>
+                <button class="swatch-btn btn-yellow" data-color="#FFDC00" aria-label="Morph to Yellow Character" aria-selected="false" role="tab">
+                    <span>🐝</span>
+                </button>
+                <button class="swatch-btn btn-green" data-color="#2ECC40" aria-label="Morph to Green Character" aria-selected="false" role="tab">
+                    <span>🐸</span>
+                </button>
+                <button class="swatch-btn btn-blue" data-color="#0074D9" aria-label="Morph to Blue Character" aria-selected="false" role="tab">
+                    <span>🐳</span>
+                </button>
+                <button class="swatch-btn btn-purple" data-color="#B10DC9" aria-label="Morph to Purple Character" aria-selected="false" role="tab">
+                    <span>👾</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import gsap from 'gsap';
+
+        // --- Configuration ---
+        const CONFIG = {
+            cameraZ: 2.5,
+            noiseSpeed: 0.4,
+            noiseDensity: 1.5,
+            noiseStrength: 0.3,
+        };
+
+        // --- Scene Setup ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        // Camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = CONFIG.cameraZ;
+
+        // Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for retina
+        renderer.setClearColor(0x000000, 0); // Transparent background
+        container.appendChild(renderer.domElement);
+
+        // Controls (Optional interaction)
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false; // Keep the immersive feel fixed
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.0;
+
+        // --- Lighting ---
+        // We use lighting to give volume to the noise displacement
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+
+        const accentLight = new THREE.PointLight(0xFF4136, 2, 10);
+        accentLight.position.set(-2, -2, 2);
+        scene.add(accentLight);
+
+        // --- The Shader Material (The Magic) ---
+        // Using Perlin Noise logic inside vertex shader for the organic blob effect
+        
+        const vertexShader = `
+            uniform float uTime;
+            uniform float uStrength;
+            uniform float uDensity;
+            
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            varying float vDisplacement;
+
+            // Classic Perlin 3D Noise 
+            // (Source: cellular noise algorithms commonly used in glsl)
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+            vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+            float snoise(vec3 v) { 
+                const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+                const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+                vec3 i  = floor(v + dot(v, C.yyy) );
+                vec3 x0 = v - i + dot(i, C.xxx) ;
+                vec3 g = step(x0.yzx, x0.xyz);
+                vec3 l = 1.0 - g;
+                vec3 i1 = min( g.xyz, l.zxy );
+                vec3 i2 = max( g.xyz, l.zxy );
+                vec3 x1 = x0 - i1 + C.xxx;
+                vec3 x2 = x0 - i2 + C.yyy;
+                vec3 x3 = x0 - D.yyy;
+                i = mod289(i); 
+                vec4 p = permute( permute( permute( 
+                            i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+                        + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+                        + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+                float n_ = 0.142857142857; 
+                vec3  ns = n_ * D.wyz - D.xzx;
+                vec4 j = p - 49.0 * floor(p * ns.z * ns.z); 
+                vec4 x_ = floor(j * ns.z);
+                vec4 y_ = floor(j - 7.0 * x_ );  
+                vec4 x = x_ *ns.x + ns.yyyy;
+                vec4 y = y_ *ns.x + ns.yyyy;
+                vec4 h = 1.0 - abs(x) - abs(y);
+                vec4 b0 = vec4( x.xy, y.xy );
+                vec4 b1 = vec4( x.zw, y.zw );
+                vec4 s0 = floor(b0)*2.0 + 1.0;
+                vec4 s1 = floor(b1)*2.0 + 1.0;
+                vec4 sh = -step(h, vec4(0.0));
+                vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+                vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+                vec3 p0 = vec3(a0.xy,h.x);
+                vec3 p1 = vec3(a0.zw,h.y);
+                vec3 p2 = vec3(a1.xy,h.z);
+                vec3 p3 = vec3(a1.zw,h.w);
+                vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+                p0 *= norm.x;
+                p1 *= norm.y;
+                p2 *= norm.z;
+                p3 *= norm.w;
+                
+                // Correct calculation for Simplex Noise return
+                vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                m = m * m;
+                return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+            }
+            
+            // Using snoise for organic fluid motion
+            float smoothNoise(vec3 p, float time) {
+                // Combine time with position for 4D-like noise
+                float d = snoise(p * uDensity + vec3(time));
+                return d;
+            }
+
+            void main() {
+                vUv = uv;
+                vNormal = normal; // Pass normal to fragment shader
+                
+                // Displace vertices along their normal
+                float t = uTime * 0.4; // Speed
+                float distortion = smoothNoise(position, t);
+                
+                vDisplacement = distortion;
+                
+                // Calculate new position
+                vec3 newPosition = position + normal * (distortion * uStrength);
+                
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform vec3 uColor;
+            uniform float uTime;
+            
+            varying vec2 vUv;
+            varying vec3 vNormal;
+            varying float vDisplacement;
+
+            void main() {
+                // Base color
+                vec3 color = uColor;
+                
+                // Add some "fresnel" like glow based on normals
+                float fresnel = dot(vNormal, vec3(0.0, 0.0, 1.0));
+                fresnel = pow(fresnel, 3.0);
+                
+                // Mix the color with displacement for depth
+                // Lighter peaks, darker valleys
+                vec3 lightColor = color + vec3(0.2);
+                vec3 darkColor = color - vec3(0.2);
+                
+                vec3 finalColor = mix(darkColor, lightColor, vDisplacement * 0.5 + 0.5);
+                
+                // Add specular highlight
+                finalColor += vec3(fresnel * 0.4);
+
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+        // --- Mesh Creation ---
+        // Icosahedron allows for nice geometric deformation
+        const geometry = new THREE.IcosahedronGeometry(1, 64); 
+        
+        const uniforms = {
+            uTime: { value: 0 },
+            uColor: { value: new THREE.Color('#FF4136') }, // Start with RED (Active Btn)
+            uStrength: { value: CONFIG.noiseStrength },
+            uDensity: { value: CONFIG.noiseDensity }
+        };
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            uniforms: uniforms,
+            wireframe: false,
+            side: THREE.DoubleSide
+        });
+
+        const blob = new THREE.Mesh(geometry, material);
+        scene.add(blob);
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const elapsedTime = clock.getElapsedTime();
+            
+            // Update Uniforms
+            blob.material.uniforms.uTime.value = elapsedTime;
+            
+            // Subtle floating rotation independently of OrbitControls
+            blob.rotation.y += 0.001;
+            blob.rotation.z += 0.001;
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // --- Interactions & Morphing Logic ---
+        const buttons = document.querySelectorAll('.swatch-btn');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // 1. UI Updates
+                buttons.forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+
+                // 2. Get Data
+                const colorHex = btn.getAttribute('data-color');
+                const newColor = new THREE.Color(colorHex);
+
+                // 3. GSAP Animations for "Morphing"
+                
+                // A. Color Transition
+                gsap.to(blob.material.uniforms.uColor.value, {
+                    r: newColor.r,
+                    g: newColor.g,
+                    b: newColor.b,
+                    duration: 1.5,
+                    ease: "power2.inOut"
+                });
+
+                // B. "Surge" Effect (Excitement in the mesh)
+                // We spike the strength and density temporarily to simulate a reaction
+                const tl = gsap.timeline();
+                
+                tl.to(blob.material.uniforms.uStrength, {
+                    value: 0.8, // Spike up
+                    duration: 0.3,
+                    ease: "power2.out"
+                })
+                .to(blob.material.uniforms.uStrength, {
+                    value: CONFIG.noiseStrength, // Return to normal
+                    duration: 1.2,
+                    ease: "elastic.out(1, 0.5)"
+                });
+
+                // C. Density Shift (Change complexity briefly)
+                gsap.to(blob.material.uniforms.uDensity, {
+                    value: CONFIG.noiseDensity + 1.0, 
+                    yoyo: true,
+                    repeat: 1,
+                    duration: 0.5
+                });
+                
+                // D. Update Background Ambient Light to match slightly
+                gsap.to(accentLight.color, {
+                    r: newColor.r,
+                    g: newColor.g,
+                    b: newColor.b,
+                    duration: 1
+                });
+            });
+        });
+
+        // --- Window Resize Handling ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
