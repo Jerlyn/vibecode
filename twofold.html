@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#36069A">
+<meta name="description" content="Twofold: merge identical neighbors until one number remains.">
+<title>Twofold · Merge Puzzle</title>
+<style>
+:root{
+  --purple:#36069A; --pink:#DE6399; --navy:#020C28; --teal:#4ADEDE;
+  --white:#FFFFFF; --bg:#F8F9FA; --ink:#212529; --muted:#6C757D; --line:#ADB5BD;
+  --n:3;
+  --board:min(92vw, 520px);
+}
+@supports (height:1dvh){
+  :root{ --board:max(260px, min(92vw, 520px, calc(100dvh - 300px))); }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-tap-highlight-color:transparent;
+}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.app{max-width:560px;margin:0 auto;padding:14px 16px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+
+/* Header */
+.top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;color:var(--purple);display:flex;align-items:center;gap:8px}
+.brand .mark{display:inline-grid;grid-template-columns:1fr 1fr;gap:3px}
+.brand .mark i{width:11px;height:11px;border-radius:3px;display:block}
+.top-actions{display:flex;gap:8px}
+.icon-btn,.pill-btn{
+  min-width:48px;min-height:48px;border-radius:999px;border:2px solid var(--purple);
+  background:var(--white);color:var(--purple);font:inherit;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 16px;
+}
+.icon-btn{padding:0;font-size:1.2rem}
+
+/* Status */
+.status{
+  width:var(--board);display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--white);border:1px solid var(--line);border-radius:16px;padding:10px 6px;text-align:center;
+}
+.status > div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.status > div + div{border-left:1px solid var(--line)}
+.label{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.status strong{font-size:1.35rem;color:var(--navy);font-variant-numeric:tabular-nums}
+
+/* Tile colors (text/background pairs all meet WCAG AA 4.5:1) */
+.t{border:2px solid var(--navy);font-weight:800;font-variant-numeric:tabular-nums}
+.t[data-v="2"]  {background:var(--teal);  color:var(--navy)}
+.t[data-v="4"]  {background:var(--pink);  color:var(--navy)}
+.t[data-v="8"]  {background:var(--purple);color:var(--white)}
+.t[data-v="16"] {background:var(--navy);  color:var(--teal)}
+.t[data-v="32"] {background:var(--white); color:var(--purple);border:3px solid var(--purple)}
+.t[data-v="64"] {background:var(--navy);  color:var(--pink)}
+.t[data-v="128"]{background:var(--purple);color:var(--teal)}
+.mini{width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:.95rem}
+
+/* Board */
+.board{
+  --gap:calc(var(--board) * .028);
+  width:var(--board);height:var(--board);
+  display:grid;grid-template-columns:repeat(var(--n),1fr);grid-template-rows:repeat(var(--n),1fr);
+  gap:var(--gap);padding:var(--gap);
+  background:var(--white);border:1px solid var(--line);border-radius:22px;
+  touch-action:none;user-select:none;-webkit-user-select:none;position:relative;
+}
+.cell{
+  all:unset;position:relative;border-radius:18%;background:var(--bg);
+  box-shadow:inset 0 0 0 1px #E3E6EA;cursor:pointer;
+}
+.cell:focus-visible{box-shadow:0 0 0 3px var(--white),0 0 0 6px var(--navy);z-index:3}
+.tile{
+  position:absolute;inset:0;border-radius:18%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:calc(var(--board) / var(--n) * .38);
+  box-shadow:inset 0 -.18em 0 rgba(2,12,40,.22);
+  transition:transform .14s ease;will-change:transform;
+}
+.tile[data-len="3"]{font-size:calc(var(--board) / var(--n) * .3)}
+.cell.selected .tile{transform:translateY(-4%) scale(1.06);outline:4px solid var(--purple);outline-offset:3px;z-index:2}
+.cell.target .tile{outline:3px dashed var(--purple);outline-offset:3px}
+.cell.target.hinted .tile{animation:pulse 1s ease-in-out infinite}
+.cell.drop-ok .tile{transform:scale(1.08)}
+.tile.dragging{z-index:10;transition:none;box-shadow:0 12px 24px rgba(2,12,40,.3),inset 0 -.18em 0 rgba(2,12,40,.22)}
+.tile.pop{animation:pop .22s ease-out}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.16)}100%{transform:scale(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+.msg{min-height:1.5em;margin:0;width:var(--board);text-align:center;font-weight:600;color:var(--ink)}
+
+/* Controls */
+.controls{width:var(--board);display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.btn{
+  min-height:52px;border-radius:999px;font:inherit;font-weight:700;font-size:1rem;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;
+  border:2px solid var(--purple);background:var(--white);color:var(--purple);
+}
+.btn svg,.icon-btn svg,.pill-btn svg{width:20px;height:20px;flex:none}
+.btn-primary{background:var(--purple);color:var(--white)}
+.btn:disabled{border-color:var(--line);color:var(--muted);background:var(--bg);cursor:not-allowed}
+.btn:focus-visible,.icon-btn:focus-visible,.pill-btn:focus-visible,.lvl:focus-visible,.link:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+@media (hover:hover){
+  .btn:not(:disabled):hover,.icon-btn:hover,.pill-btn:hover{background:#F1ECFA}
+  .btn-primary:not(:disabled):hover{background:#2A0478}
+}
+.foot{margin:0;font-size:.85rem;color:var(--ink)}
+
+/* Dialogs */
+dialog{border:none;border-radius:22px;padding:24px;width:min(92vw,440px);max-height:88dvh;color:var(--ink);background:var(--white)}
+dialog::backdrop{background:rgba(2,12,40,.62)}
+dialog h2{margin:0 0 8px;color:var(--purple);font-size:1.4rem}
+dialog p{margin:0 0 12px}
+.d-actions{display:grid;gap:10px;margin-top:18px}
+.how{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:16px;text-align:center}
+.how figure{margin:0}
+.how figcaption{font-weight:700;color:var(--purple);margin-top:8px;font-size:.95rem}
+.demo{display:inline-grid;grid-template-columns:repeat(2,34px);gap:6px}
+.demo span{width:34px;height:34px;border-radius:9px;background:var(--bg);box-shadow:inset 0 0 0 1px #E3E6EA}
+.demo .mini{border-radius:9px}
+.rules{margin:0;padding-left:20px}
+.rules li{margin-bottom:6px}
+.stars{display:flex;justify-content:center;gap:8px;margin:6px 0 12px}
+.stars svg{width:44px;height:44px}
+.lvl-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.lvl{
+  min-height:56px;border-radius:14px;border:2px solid var(--purple);background:var(--white);color:var(--purple);
+  font:inherit;font-weight:800;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;
+}
+.lvl small{font-size:.7rem;font-weight:700;color:var(--navy);letter-spacing:.05em}
+.lvl.current{background:var(--purple);color:var(--white)}
+.lvl.current small{color:var(--white)}
+.lvl:disabled{border-color:var(--line);color:var(--muted);background:var(--bg);cursor:not-allowed}
+.link{background:none;border:none;color:var(--purple);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:12px 4px;min-height:44px}
+.section-title{margin:16px 0 0;font-size:.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* Confetti */
+.confetti{position:fixed;top:-12px;width:10px;height:14px;border-radius:2px;pointer-events:none;z-index:50;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.9}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+@media (max-width:380px){
+  .btn span.lbl{font-size:.92rem}
+  .btn{gap:6px;padding:0 8px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <h1 class="brand">
+      <span class="mark" aria-hidden="true"><i style="background:#4ADEDE"></i><i style="background:#DE6399"></i><i style="background:#36069A"></i><i style="background:#020C28"></i></span>
+      Twofold
+    </h1>
+    <div class="top-actions">
+      <button class="icon-btn" id="helpBtn" type="button" aria-label="How to play" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9.1 9a3 3 0 1 1 4.2 2.7c-.8.4-1.3 1.1-1.3 2v.6"/><circle cx="12" cy="18" r=".6" fill="currentColor"/></svg>
+      </button>
+      <button class="pill-btn" id="levelsBtn" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+        Levels
+      </button>
+    </div>
+  </header>
+
+  <section class="status" aria-label="Level status">
+    <div><span class="label">Level</span><strong id="lvl">1</strong></div>
+    <div><span class="label">Goal</span><span class="t mini" id="goal" data-v="4">4</span></div>
+    <div><span class="label">Tiles left</span><strong id="left">2</strong></div>
+  </section>
+
+  <div id="board" class="board" role="group" aria-label="Puzzle board" aria-describedby="boardHelp"></div>
+  <p id="boardHelp" class="sr-only">Use arrow keys to move between cells. Press Enter to pick a tile, then press Enter on a matching neighbor to merge. Escape cancels.</p>
+  <p id="msg" class="msg" role="status" aria-live="polite"></p>
+
+  <div class="controls">
+    <button class="btn" id="undoBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      <span class="lbl">Undo</span>
+    </button>
+    <button class="btn btn-primary" id="hintBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z"/></svg>
+      <span class="lbl">Hint</span>
+    </button>
+    <button class="btn" id="restartBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      <span class="lbl">Restart</span>
+    </button>
+  </div>
+  <p class="foot">Undo is free. Hints cost a star. Progress saves on this device.</p>
+</main>
+
+<div id="sr" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<!-- How to play -->
+<dialog id="helpDlg" aria-labelledby="helpTitle">
+  <h2 id="helpTitle">How to play</h2>
+  <div class="how" aria-hidden="true">
+    <figure>
+      <div class="demo"><span class="t mini" data-v="2">2</span><span class="t mini" data-v="2">2</span><span></span><span class="t mini" data-v="4">4</span></div>
+      <figcaption>Merge identical neighbors</figcaption>
+    </figure>
+    <figure>
+      <div class="demo"><span></span><span></span><span></span><span class="t mini" data-v="16">16</span></div>
+      <figcaption>Until one number remains</figcaption>
+    </figure>
+  </div>
+  <ul class="rules">
+    <li>Every board starts with only 2s.</li>
+    <li>Tap a tile, then tap a matching tile beside it (up, down, left or right). You can also drag one onto the other.</li>
+    <li>The tile you move leaves an empty cell behind, and empty cells never refill.</li>
+    <li>Plan ahead. A tile cut off from its matches is stuck for good.</li>
+  </ul>
+  <div class="d-actions"><button class="btn btn-primary" id="helpClose" type="button" autofocus>Let's play</button></div>
+</dialog>
+
+<!-- Win -->
+<dialog id="winDlg" aria-labelledby="winTitle" aria-describedby="winText">
+  <h2 id="winTitle" style="text-align:center">Level complete</h2>
+  <div class="stars" id="stars" role="img" aria-label="3 of 3 stars"></div>
+  <p id="winText" style="text-align:center"></p>
+  <div class="d-actions">
+    <button class="btn btn-primary" id="nextBtn" type="button" autofocus>Next level</button>
+    <button class="btn" id="replayBtn" type="button">Replay level</button>
+  </div>
+</dialog>
+
+<!-- Levels -->
+<dialog id="lvlDlg" aria-labelledby="lvlTitle">
+  <h2 id="lvlTitle">Levels</h2>
+  <p>Finish a level to unlock the next one. Replay any level to earn more stars.</p>
+  <div id="lvlList"></div>
+  <div class="d-actions">
+    <button class="btn" id="lvlClose" type="button">Close</button>
+    <button class="link" id="resetBtn" type="button">Reset all progress</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+'use strict';
+/* ---------- Storage (safe) ---------- */
+const KEY = 'twofold.v1.';
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(KEY+k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(KEY+k, JSON.stringify(v)); }catch(e){} },
+  clear(){ try{ Object.keys(localStorage).filter(k=>k.startsWith(KEY)).forEach(k=>localStorage.removeItem(k)); }catch(e){} }
+};
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/* ---------- Level design ---------- */
+const MAIN_LEVELS = 30;
+const CHAPTERS = [
+  {from:1,  to:1,  n:3, t:4,  name:'Warm-up'},
+  {from:2,  to:3,  n:3, t:8,  name:'Warm-up'},
+  {from:4,  to:7,  n:3, t:16, name:'Small board'},
+  {from:8,  to:12, n:4, t:16, name:'Room to move'},
+  {from:13, to:18, n:4, t:32, name:'Packed'},
+  {from:19, to:24, n:5, t:32, name:'Wide open'},
+  {from:25, to:30, n:6, t:32, name:'Grand board'}
+];
+function spec(L){
+  const c = CHAPTERS.find(c => L >= c.from && L <= c.to);
+  if (c) return {n:c.n, t:c.t};
+  return L % 2 ? {n:5, t:32} : {n:6, t:32};       // bonus levels after 30
+}
+function rng(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const nbrCache = {};
+function nbrs(i, n){
+  const key = n;
+  if (!nbrCache[key]){
+    nbrCache[key] = Array.from({length:n*n}, (_, k) => {
+      const r = (k / n) | 0, c = k % n, o = [];
+      if (r > 0) o.push(k - n); if (r < n - 1) o.push(k + n);
+      if (c > 0) o.push(k - 1); if (c < n - 1) o.push(k + 1);
+      return o;
+    });
+  }
+  return nbrCache[key][i];
+}
+function legalMoves(b, n){
+  const m = [];
+  for (let i = 0; i < b.length; i++) if (b[i]) for (const j of nbrs(i, n)) if (b[j] === b[i]) m.push([i, j]);
+  return m;
+}
+function tileCount(b){ let c = 0; for (const v of b) if (v) c++; return c; }
+
+/* Reverse generation: start from the goal tile and split it into
+   halves on empty neighbors until every tile is a 2.
+   Each split is an un-merge, so every level is solvable. */
+function randomPlayWins(b0, n, R){
+  const b = b0.slice();
+  for (;;){
+    const m = legalMoves(b, n);
+    if (!m.length) return tileCount(b) === 1;
+    const [i, j] = m[(R() * m.length) | 0];
+    b[j] *= 2; b[i] = 0;
+  }
+}
+const levelCache = {};
+function generate(L){
+  if (levelCache[L]) return levelCache[L];
+  const {n, t} = spec(L);
+  const R = rng(L * 7919 + 13);
+  let fallback = null;
+  for (let attempt = 0; attempt < 4000; attempt++){
+    const b = new Array(n * n).fill(0);
+    b[(R() * n * n) | 0] = t;
+    let ok = true;
+    for (;;){
+      const splittable = [];
+      for (let i = 0; i < b.length; i++) if (b[i] > 2 && nbrs(i, n).some(j => !b[j])) splittable.push(i);
+      if (!splittable.length){ ok = b.every(v => v === 0 || v === 2); break; }
+      const i = splittable[(R() * splittable.length) | 0];
+      const empty = nbrs(i, n).filter(j => !b[j]);
+      const j = empty[(R() * empty.length) | 0];
+      b[i] /= 2; b[j] = b[i];
+    }
+    if (!ok) continue;
+    if (!fallback) fallback = b;
+    // Past the warm-up, require that careless play can fail.
+    if (L >= 4){
+      let wins = 0;
+      for (let k = 0; k < 8; k++) if (randomPlayWins(b, n, R)) wins++;
+      const maxWins = L < 13 ? 6 : L < 25 ? 4 : 2;
+      if (wins > maxWins) continue;
+    }
+    return (levelCache[L] = {n, t, board:b});
+  }
+  return (levelCache[L] = {n, t, board:fallback});
+}
+
+/* Solver for hints: depth-first with pruning.
+   Dead state: a tile whose neighbors are all empty or larger can never merge again. */
+function solve(b0, n, limit = 250000){
+  const seen = new Set(); let nodes = 0;
+  function dead(b){
+    if (tileCount(b) <= 1) return false;
+    for (let i = 0; i < b.length; i++){
+      if (!b[i]) continue;
+      if (!nbrs(i, n).some(j => b[j] && b[j] <= b[i])) return true;
+    }
+    return false;
+  }
+  function rec(b){
+    if (++nodes > limit) throw new Error('limit');
+    if (tileCount(b) === 1) return [];
+    if (dead(b)) return null;
+    const k = b.join(',');
+    if (seen.has(k)) return null;
+    seen.add(k);
+    // Prefer merging small tiles first; it keeps options open.
+    const m = legalMoves(b, n).sort((x, y) => b[x[0]] - b[y[0]]);
+    for (const [i, j] of m){
+      const c = b.slice(); c[j] *= 2; c[i] = 0;
+      const r = rec(c);
+      if (r){ r.unshift([i, j]); return r; }
+    }
+    return null;
+  }
+  try { return rec(b0.slice()); } catch(e){ return undefined; }
+}
+
+/* ---------- State ---------- */
+let unlocked = store.get('unlocked', 1);
+let stars = store.get('stars', {});
+const S = { L:1, n:3, t:4, board:[], history:[], hints:0, selected:-1, hintTarget:-1, focus:0, busy:false };
+
+/* ---------- DOM ---------- */
+const $ = id => document.getElementById(id);
+const boardEl = $('board'), msgEl = $('msg'), srEl = $('sr');
+let cells = [];
+
+function announce(text){
+  srEl.textContent = '';
+  setTimeout(() => { srEl.textContent = text; }, 30);
+}
+function say(text){ msgEl.textContent = text; }
+function rc(i){ return `row ${((i / S.n) | 0) + 1}, column ${(i % S.n) + 1}`; }
+function canMerge(a, b){ return a >= 0 && b >= 0 && a !== b && S.board[a] && S.board[a] === S.board[b] && nbrs(a, S.n).includes(b); }
+
+function render(){
+  boardEl.style.setProperty('--n', S.n);
+  if (cells.length !== S.n * S.n){
+    boardEl.innerHTML = '';
+    cells = [];
+    for (let i = 0; i < S.n * S.n; i++){
+      const c = document.createElement('button');
+      c.type = 'button'; c.className = 'cell'; c.dataset.i = i;
+      boardEl.appendChild(c); cells.push(c);
+    }
+  }
+  S.board.forEach((v, i) => {
+    const c = cells[i];
+    let tile = c.firstElementChild;
+    if (v){
+      if (!tile){ tile = document.createElement('span'); tile.className = 'tile t'; tile.setAttribute('aria-hidden','true'); c.appendChild(tile); }
+      tile.dataset.v = v; tile.dataset.len = String(v).length; tile.textContent = v;
+      tile.style.transform = ''; tile.style.transition = ''; tile.classList.remove('dragging');
+    } else if (tile) tile.remove();
+  });
+  paint();
+  $('lvl').textContent = S.L > MAIN_LEVELS ? `${S.L}★` : S.L;
+  const g = $('goal'); g.dataset.v = S.t; g.textContent = S.t;
+  g.setAttribute('aria-label', `Make one ${S.t}`);
+  $('left').textContent = tileCount(S.board);
+  $('undoBtn').disabled = !S.history.length;
+  $('restartBtn').disabled = !S.history.length;
+  $('hintBtn').disabled = tileCount(S.board) <= 1;
+}
+
+function paint(){
+  cells.forEach((c, i) => {
+    const v = S.board[i];
+    const sel = i === S.selected;
+    const tgt = S.selected >= 0 && canMerge(S.selected, i) && (S.hintTarget < 0 || i === S.hintTarget);
+    c.classList.toggle('selected', sel);
+    c.classList.toggle('target', tgt);
+    c.classList.toggle('hinted', tgt && i === S.hintTarget);
+    c.tabIndex = i === S.focus ? 0 : -1;
+    c.setAttribute('aria-label',
+      `${rc(i)}: ${v ? 'tile ' + v : 'empty'}${sel ? ', selected' : ''}${tgt ? ', can merge here' : ''}`);
+    c.setAttribute('aria-pressed', sel ? 'true' : 'false');
+  });
+}
+
+function save(){
+  store.set('unlocked', unlocked);
+  store.set('stars', stars);
+  store.set('game', {L:S.L, board:S.board, hints:S.hints});
+}
+
+/* ---------- Game flow ---------- */
+function loadLevel(L, resume){
+  const g = generate(L);
+  S.L = L; S.n = g.n; S.t = g.t;
+  S.board = resume && resume.board && resume.board.length === g.n * g.n ? resume.board.slice() : g.board.slice();
+  S.hints = resume ? (resume.hints || 0) : 0;
+  S.history = []; S.selected = -1; S.hintTarget = -1; S.busy = false;
+  S.focus = S.board.findIndex(v => v);
+  say('');
+  render(); save();
+  announce(`Level ${L}. ${tileCount(S.board)} tiles of 2. Merge them into one ${S.t}.`);
+}
+
+function select(i){
+  S.selected = i; S.hintTarget = -1;
+  paint();
+  const n = nbrs(i, S.n).filter(j => canMerge(i, j)).length;
+  announce(n ? `Picked ${S.board[i]} at ${rc(i)}. ${n} matching neighbor${n > 1 ? 's' : ''}.` : `Picked ${S.board[i]} at ${rc(i)}. No matching neighbor yet.`);
+}
+function deselect(){ S.selected = -1; S.hintTarget = -1; paint(); }
+
+function activate(i){
+  if (S.busy) return;
+  S.focus = i;
+  if (S.selected >= 0){
+    if (i === S.selected){ deselect(); announce('Cancelled.'); return; }
+    if (canMerge(S.selected, i)){ merge(S.selected, i); return; }
+    if (S.board[i]){ select(i); return; }
+    deselect(); return;
+  }
+  if (S.board[i]) select(i); else paint();
+}
+
+function merge(a, b, draggedTile){
+  S.busy = true;
+  const src = draggedTile || cells[a].firstElementChild;
+  const ra = cells[a].getBoundingClientRect(), rb = cells[b].getBoundingClientRect();
+  const commit = () => {
+    S.history.push({board:S.board.slice()});
+    S.board[b] *= 2; S.board[a] = 0;
+    S.selected = -1; S.hintTarget = -1; S.focus = b; S.busy = false;
+    say('');
+    render(); save();
+    const t = cells[b].firstElementChild;
+    if (t && !reduceMotion.matches){ t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop'); }
+    if (navigator.vibrate) { try{ navigator.vibrate(12); }catch(e){} }
+    if (document.activeElement && boardEl.contains(document.activeElement)) cells[b].focus();
+    const left = tileCount(S.board);
+    if (left === 1) return win();
+    if (!legalMoves(S.board, S.n).length){
+      say('No merges left. Undo or restart.');
+      announce(`Merged into ${S.board[b]}. No merges left. Undo or restart.`);
+    } else announce(`Merged into ${S.board[b]}. ${left} tiles left.`);
+  };
+  if (reduceMotion.matches || !src){ commit(); return; }
+  src.classList.add('dragging');
+  src.style.transition = 'transform .14s ease-in';
+  requestAnimationFrame(() => {
+    src.style.transform = `translate(${rb.left - ra.left}px, ${rb.top - ra.top}px) scale(.92)`;
+  });
+  setTimeout(commit, 150);
+}
+
+function undo(){
+  if (S.busy || !S.history.length) return;
+  S.board = S.history.pop().board;
+  S.selected = -1; S.hintTarget = -1;
+  say(''); render(); save();
+  announce(`Undone. ${tileCount(S.board)} tiles left.`);
+}
+function restart(){
+  if (S.busy) return;
+  const h = S.hints;
+  loadLevel(S.L);
+  S.hints = h;        // hints already taken on this attempt still count
+  save();
+}
+
+function hint(){
+  if (S.busy || tileCount(S.board) <= 1) return;
+  say('Thinking…');
+  setTimeout(() => {
+    const path = solve(S.board, S.n);
+    if (path === null){
+      say("This board can't be finished from here. Undo a few moves.");
+      announce("This board can't be finished from here. Undo a few moves.");
+      return;
+    }
+    let move = path && path[0];
+    if (!move){ const m = legalMoves(S.board, S.n); move = m[0]; }
+    if (!move){ say('No merges left. Undo or restart.'); return; }
+    S.hints++; save();
+    S.selected = move[0]; S.hintTarget = move[1]; S.focus = move[1];
+    paint();
+    say(`Hint: merge the highlighted ${S.board[move[0]]}s.`);
+    announce(`Hint: merge ${S.board[move[0]]} at ${rc(move[0])} into ${rc(move[1])}. The first tile is picked. Press Enter on the second.`);
+    if (document.activeElement && boardEl.contains(document.activeElement)) cells[move[1]].focus();
+  }, 20);
+}
+
+function starSvg(on){
+  return on
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" fill="#DE6399" stroke="#020C28" stroke-width="1.4" stroke-linejoin="round"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3L2.9 9.5l6.3-.9z" fill="#F8F9FA" stroke="#6C757D" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+}
+function win(){
+  const earned = S.hints === 0 ? 3 : S.hints === 1 ? 2 : 1;
+  stars[S.L] = Math.max(stars[S.L] || 0, earned);
+  unlocked = Math.max(unlocked, S.L + 1);
+  store.set('game', {L:S.L + 1, board:null, hints:0});
+  store.set('unlocked', unlocked); store.set('stars', stars);
+  $('winTitle').textContent = S.L >= MAIN_LEVELS ? `Level ${S.L} complete` : `Level ${S.L} of ${MAIN_LEVELS} complete`;
+  $('stars').innerHTML = [1,2,3].map(k => starSvg(k <= earned)).join('');
+  $('stars').setAttribute('aria-label', `${earned} of 3 stars`);
+  $('winText').textContent = earned === 3
+    ? `You made ${S.t} with no hints.`
+    : `You made ${S.t} using ${S.hints} hint${S.hints > 1 ? 's' : ''}. Replay with no hints for 3 stars.`;
+  $('nextBtn').textContent = S.L === MAIN_LEVELS ? 'Play bonus levels' : 'Next level';
+  confetti();
+  setTimeout(() => openDialog($('winDlg')), reduceMotion.matches ? 0 : 380);
+}
+
+function confetti(){
+  if (reduceMotion.matches) return;
+  const colors = ['#36069A','#DE6399','#4ADEDE','#020C28'];
+  for (let k = 0; k < 42; k++){
+    const p = document.createElement('span');
+    p.className = 'confetti';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = colors[k % 4];
+    p.style.animationDelay = Math.random() * .35 + 's';
+    p.style.animationDuration = 1.2 + Math.random() * .8 + 's';
+    p.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2600);
+  }
+}
+
+/* ---------- Dialogs ---------- */
+let lastFocus = null;
+function openDialog(d){
+  lastFocus = document.activeElement;
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+}
+function closeDialog(d){
+  if (typeof d.close === 'function') d.close(); else d.removeAttribute('open');
+}
+document.querySelectorAll('dialog').forEach(d => d.addEventListener('close', () => {
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}));
+
+function buildLevels(){
+  const list = $('lvlList'); list.innerHTML = '';
+  const maxShown = Math.max(MAIN_LEVELS, unlocked);
+  const groups = CHAPTERS.slice();
+  if (maxShown > MAIN_LEVELS) groups.push({from:MAIN_LEVELS + 1, to:maxShown, name:'Bonus', n:0});
+  let lastName = '';
+  groups.forEach(g => {
+    if (g.name !== lastName){
+      const h = document.createElement('h3'); h.className = 'section-title';
+      const first = groups.find(x => x.name === g.name), lastG = groups.filter(x => x.name === g.name).pop();
+      h.textContent = g.n ? `${g.name} · ${g.n}×${g.n}` : g.name;
+      if (g.name === 'Warm-up') h.textContent = 'Warm-up · 3×3';
+      list.appendChild(h);
+      const grid = document.createElement('div'); grid.className = 'lvl-grid'; grid.dataset.name = g.name;
+      list.appendChild(grid); lastName = g.name;
+    }
+    const grid = list.querySelector(`.lvl-grid[data-name="${g.name}"]`);
+    for (let L = g.from; L <= g.to; L++){
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'lvl' + (L === S.L ? ' current' : '');
+      const st = stars[L] || 0;
+      if (L > unlocked){
+        b.disabled = true;
+        b.innerHTML = `${L}<small aria-hidden="true">🔒</small>`;
+        b.setAttribute('aria-label', `Level ${L}, locked`);
+      } else {
+        b.innerHTML = `${L}<small aria-hidden="true">${st ? '★'.repeat(st) : 'new'}</small>`;
+        b.setAttribute('aria-label', `Level ${L}${st ? `, ${st} of 3 stars` : ', not finished yet'}${L === S.L ? ', current' : ''}`);
+        b.addEventListener('click', () => { closeDialog($('lvlDlg')); loadLevel(L); });
+      }
+      grid.appendChild(b);
+    }
+  });
+}
+
+/* ---------- Pointer input (tap + drag) ---------- */
+let drag = null;
+function cellAt(x, y){
+  for (let i = 0; i < cells.length; i++){
+    const r = cells[i].getBoundingClientRect();
+    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return i;
+  }
+  return -1;
+}
+boardEl.addEventListener('pointerdown', e => {
+  if (S.busy || (e.button !== undefined && e.button > 0)) return;
+  const cell = e.target.closest('.cell'); if (!cell) return;
+  e.preventDefault();
+  const i = +cell.dataset.i;
+  drag = {id:e.pointerId, i, x:e.clientX, y:e.clientY, moved:false, tile:cell.firstElementChild, over:-1};
+  try{ boardEl.setPointerCapture(e.pointerId); }catch(err){}
+});
+boardEl.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moved){
+    if (!S.board[drag.i] || Math.hypot(dx, dy) < 8) return;
+    drag.moved = true;
+    drag.tile.classList.add('dragging');
+    S.selected = drag.i; S.hintTarget = -1; paint();
+  }
+  drag.tile.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
+  const over = cellAt(e.clientX, e.clientY);
+  if (over !== drag.over){
+    if (drag.over >= 0) cells[drag.over].classList.remove('drop-ok');
+    drag.over = over;
+    if (canMerge(drag.i, over)) cells[over].classList.add('drop-ok');
+  }
+});
+function endDrag(e, cancelled){
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag; drag = null;
+  if (d.over >= 0) cells[d.over].classList.remove('drop-ok');
+  if (!d.moved){ if (!cancelled){ activate(d.i); } return; }
+  if (!cancelled && canMerge(d.i, d.over)){ S.focus = d.over; merge(d.i, d.over, d.tile); return; }
+  // Snap back
+  d.tile.style.transition = 'transform .16s ease-out';
+  d.tile.style.transform = '';
+  setTimeout(() => { d.tile.classList.remove('dragging'); d.tile.style.transition = ''; }, 170);
+  deselect();
+  if (!cancelled && d.over >= 0 && d.over !== d.i) announce('Tiles merge only with an identical neighbor.');
+}
+boardEl.addEventListener('pointerup', e => endDrag(e, false));
+boardEl.addEventListener('pointercancel', e => endDrag(e, true));
+
+/* ---------- Keyboard + assistive tech ---------- */
+boardEl.addEventListener('click', e => {
+  // Pointer taps are handled on pointerup. detail === 0 means keyboard or screen-reader activation.
+  if (e.detail !== 0) return;
+  const cell = e.target.closest('.cell'); if (cell) activate(+cell.dataset.i);
+});
+boardEl.addEventListener('keydown', e => {
+  const n = S.n; let f = S.focus;
+  const r = (f / n) | 0, c = f % n;
+  switch (e.key){
+    case 'ArrowUp':    if (r > 0) f -= n; break;
+    case 'ArrowDown':  if (r < n - 1) f += n; break;
+    case 'ArrowLeft':  if (c > 0) f -= 1; break;
+    case 'ArrowRight': if (c < n - 1) f += 1; break;
+    case 'Home': f = r * n; break;
+    case 'End': f = r * n + n - 1; break;
+    case 'Enter': case ' ': e.preventDefault(); activate(f); return;
+    case 'Escape': if (S.selected >= 0){ deselect(); announce('Cancelled.'); } return;
+    default: return;
+  }
+  e.preventDefault();
+  S.focus = f; paint(); cells[f].focus();
+});
+boardEl.addEventListener('focusin', e => {
+  const cell = e.target.closest('.cell'); if (cell){ S.focus = +cell.dataset.i; }
+});
+document.addEventListener('keydown', e => {
+  if (document.querySelector('dialog[open]')) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z'){ e.preventDefault(); undo(); }
+});
+
+/* ---------- Buttons ---------- */
+$('undoBtn').addEventListener('click', undo);
+$('restartBtn').addEventListener('click', restart);
+$('hintBtn').addEventListener('click', hint);
+$('helpBtn').addEventListener('click', () => openDialog($('helpDlg')));
+$('helpClose').addEventListener('click', () => { closeDialog($('helpDlg')); store.set('seenHelp', true); });
+$('levelsBtn').addEventListener('click', () => { buildLevels(); openDialog($('lvlDlg')); });
+$('lvlClose').addEventListener('click', () => closeDialog($('lvlDlg')));
+$('nextBtn').addEventListener('click', () => { closeDialog($('winDlg')); loadLevel(S.L + 1); });
+$('replayBtn').addEventListener('click', () => { closeDialog($('winDlg')); loadLevel(S.L); });
+$('winDlg').addEventListener('cancel', e => { e.preventDefault(); closeDialog($('winDlg')); loadLevel(S.L + 1); });
+$('resetBtn').addEventListener('click', () => {
+  if (!window.confirm('Reset all levels and stars?')) return;
+  store.clear(); unlocked = 1; stars = {};
+  closeDialog($('lvlDlg')); loadLevel(1);
+});
+
+/* ---------- Boot ---------- */
+const saved = store.get('game', null);
+if (saved && saved.L && saved.L <= unlocked){
+  loadLevel(saved.L, saved.board ? saved : null);
+} else loadLevel(Math.min(unlocked, saved && saved.L || 1));
+if (!store.get('seenHelp', false)) openDialog($('helpDlg'));
+$('helpDlg').addEventListener('close', () => store.set('seenHelp', true));
+
+// Expose for testing
+window.__twofold = {generate, solve, spec, legalMoves, S};
+})();
+</script>
+</body>
+</html>
