@@ -52,6 +52,7 @@ body{
 
 /* Tile colors (text/background pairs all meet WCAG AA 4.5:1) */
 .t{border:2px solid var(--navy);font-weight:800;font-variant-numeric:tabular-nums}
+.t[data-v="1"]  {background:var(--white); color:var(--navy)}
 .t[data-v="2"]  {background:var(--teal);  color:var(--navy)}
 .t[data-v="4"]  {background:var(--pink);  color:var(--navy)}
 .t[data-v="8"]  {background:var(--purple);color:var(--white)}
@@ -60,6 +61,7 @@ body{
 .t[data-v="64"] {background:var(--navy);  color:var(--pink)}
 .t[data-v="128"]{background:var(--purple);color:var(--teal)}
 .mini{width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:.95rem}
+.mini[data-len="3"]{font-size:.75rem;letter-spacing:-.02em}
 
 /* Board */
 .board{
@@ -172,7 +174,7 @@ dialog p{margin:0 0 12px}
 
   <section class="status" aria-label="Level status">
     <div><span class="label">Level</span><strong id="lvl">1</strong></div>
-    <div><span class="label">Goal</span><span class="t mini" id="goal" data-v="4">4</span></div>
+    <div><span class="label">Goal</span><span class="t mini" id="goal" data-v="2">2</span></div>
     <div><span class="label">Tiles left</span><strong id="left">2</strong></div>
   </section>
 
@@ -204,16 +206,17 @@ dialog p{margin:0 0 12px}
   <h2 id="helpTitle">How to play</h2>
   <div class="how" aria-hidden="true">
     <figure>
-      <div class="demo"><span class="t mini" data-v="2">2</span><span class="t mini" data-v="2">2</span><span></span><span class="t mini" data-v="4">4</span></div>
+      <div class="demo"><span class="t mini" data-v="1">1</span><span class="t mini" data-v="1">1</span><span></span><span class="t mini" data-v="2">2</span></div>
       <figcaption>Merge identical neighbors</figcaption>
     </figure>
     <figure>
-      <div class="demo"><span></span><span></span><span></span><span class="t mini" data-v="16">16</span></div>
+      <div class="demo"><span></span><span></span><span></span><span class="t mini" data-v="128" data-len="3">128</span></div>
       <figcaption>Until one number remains</figcaption>
     </figure>
   </div>
   <ul class="rules">
-    <li>Every board starts with only 2s.</li>
+    <li>Numbers build by doubling: 1, 2, 4, 8, 16, 32, 64, 128.</li>
+    <li>Early boards start with only 1s. Later boards mix in bigger numbers, and a tile only merges with its exact match.</li>
     <li>Tap a tile, then tap a matching tile beside it (up, down, left or right). You can also drag one onto the other.</li>
     <li>The tile you move leaves an empty cell behind, and empty cells never refill.</li>
     <li>Plan ahead. A tile cut off from its matches is stuck for good.</li>
@@ -247,7 +250,7 @@ dialog p{margin:0 0 12px}
 (() => {
 'use strict';
 /* ---------- Storage (safe) ---------- */
-const KEY = 'twofold.v1.';
+const KEY = 'twofold.v2.';
 const store = {
   get(k, d){ try{ const v = localStorage.getItem(KEY+k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
   set(k, v){ try{ localStorage.setItem(KEY+k, JSON.stringify(v)); }catch(e){} },
@@ -257,19 +260,24 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 /* ---------- Level design ---------- */
 const MAIN_LEVELS = 30;
+/* max  = largest value a starting tile may have (1 = all 1s)
+   stop = chance a tile at or under max stays unsplit (mixes values in)
+   tiles = allowed range of starting tiles */
 const CHAPTERS = [
-  {from:1,  to:1,  n:3, t:4,  name:'Warm-up'},
-  {from:2,  to:3,  n:3, t:8,  name:'Warm-up'},
-  {from:4,  to:7,  n:3, t:16, name:'Small board'},
-  {from:8,  to:12, n:4, t:16, name:'Room to move'},
-  {from:13, to:18, n:4, t:32, name:'Packed'},
-  {from:19, to:24, n:5, t:32, name:'Wide open'},
-  {from:25, to:30, n:6, t:32, name:'Grand board'}
+  {from:1,  to:1,  n:3, t:2,   max:1,  stop:0,   tiles:[2,2],   name:'First steps'},
+  {from:2,  to:3,  n:3, t:4,   max:1,  stop:0,   tiles:[4,4],   name:'First steps'},
+  {from:4,  to:6,  n:3, t:8,   max:1,  stop:0,   tiles:[8,8],   name:'First steps'},
+  {from:7,  to:11, n:4, t:16,  max:2,  stop:.3,  tiles:[9,14],  name:'Mixing in'},
+  {from:12, to:16, n:4, t:32,  max:4,  stop:.3,  tiles:[10,16], name:'Packed'},
+  {from:17, to:22, n:5, t:64,  max:16, stop:.35, tiles:[11,18], name:'Wide open'},
+  {from:23, to:30, n:6, t:128, max:32, stop:.35, tiles:[13,22], name:'Grand board'}
+];
+const BONUS = [
+  {n:5, t:64,  max:16, stop:.35, tiles:[11,18]},
+  {n:6, t:128, max:32, stop:.35, tiles:[13,22]}
 ];
 function spec(L){
-  const c = CHAPTERS.find(c => L >= c.from && L <= c.to);
-  if (c) return {n:c.n, t:c.t};
-  return L % 2 ? {n:5, t:32} : {n:6, t:32};       // bonus levels after 30
+  return CHAPTERS.find(c => L >= c.from && L <= c.to) || BONUS[L % 2];   // bonus levels after 30
 }
 function rng(seed){
   return function(){
@@ -299,8 +307,9 @@ function legalMoves(b, n){
 }
 function tileCount(b){ let c = 0; for (const v of b) if (v) c++; return c; }
 
-/* Reverse generation: start from the goal tile and split it into
-   halves on empty neighbors until every tile is a 2.
+/* Reverse generation: start from the goal tile and split tiles into
+   halves on empty neighbors. Early levels split down to all 1s; later
+   levels leave some tiles larger, so values are mixed.
    Each split is an un-merge, so every level is solvable. */
 function randomPlayWins(b0, n, R){
   const b = b0.slice();
@@ -314,29 +323,33 @@ function randomPlayWins(b0, n, R){
 const levelCache = {};
 function generate(L){
   if (levelCache[L]) return levelCache[L];
-  const {n, t} = spec(L);
+  const {n, t, max, stop, tiles} = spec(L);
   const R = rng(L * 7919 + 13);
   let fallback = null;
-  for (let attempt = 0; attempt < 4000; attempt++){
+  for (let attempt = 0; attempt < 6000; attempt++){
     const b = new Array(n * n).fill(0);
+    const frozen = new Uint8Array(n * n);
     b[(R() * n * n) | 0] = t;
-    let ok = true;
     for (;;){
       const splittable = [];
-      for (let i = 0; i < b.length; i++) if (b[i] > 2 && nbrs(i, n).some(j => !b[j])) splittable.push(i);
-      if (!splittable.length){ ok = b.every(v => v === 0 || v === 2); break; }
+      for (let i = 0; i < b.length; i++)
+        if (b[i] > 1 && !frozen[i] && nbrs(i, n).some(j => !b[j])) splittable.push(i);
+      if (!splittable.length) break;
       const i = splittable[(R() * splittable.length) | 0];
+      if (b[i] <= max && R() < stop){ frozen[i] = 1; continue; }
       const empty = nbrs(i, n).filter(j => !b[j]);
       const j = empty[(R() * empty.length) | 0];
       b[i] /= 2; b[j] = b[i];
+      frozen[i] = frozen[j] = 0;
     }
-    if (!ok) continue;
+    const count = tileCount(b);
+    if (b.some(v => v > max) || count < tiles[0] || count > tiles[1]) continue;
     if (!fallback) fallback = b;
     // Past the warm-up, require that careless play can fail.
     if (L >= 4){
       let wins = 0;
       for (let k = 0; k < 8; k++) if (randomPlayWins(b, n, R)) wins++;
-      const maxWins = L < 13 ? 6 : L < 25 ? 4 : 2;
+      const maxWins = L < 12 ? 6 : L < 23 ? 4 : 2;
       if (wins > maxWins) continue;
     }
     return (levelCache[L] = {n, t, board:b});
@@ -415,7 +428,7 @@ function render(){
   });
   paint();
   $('lvl').textContent = S.L > MAIN_LEVELS ? `${S.L}★` : S.L;
-  const g = $('goal'); g.dataset.v = S.t; g.textContent = S.t;
+  const g = $('goal'); g.dataset.v = S.t; g.dataset.len = String(S.t).length; g.textContent = S.t;
   g.setAttribute('aria-label', `Make one ${S.t}`);
   $('left').textContent = tileCount(S.board);
   $('undoBtn').disabled = !S.history.length;
@@ -454,7 +467,7 @@ function loadLevel(L, resume){
   S.focus = S.board.findIndex(v => v);
   say('');
   render(); save();
-  announce(`Level ${L}. ${tileCount(S.board)} tiles of 2. Merge them into one ${S.t}.`);
+  announce(`Level ${L}. ${tileCount(S.board)} tiles. Merge them into one ${S.t}.`);
 }
 
 function select(i){
@@ -604,9 +617,7 @@ function buildLevels(){
   groups.forEach(g => {
     if (g.name !== lastName){
       const h = document.createElement('h3'); h.className = 'section-title';
-      const first = groups.find(x => x.name === g.name), lastG = groups.filter(x => x.name === g.name).pop();
       h.textContent = g.n ? `${g.name} · ${g.n}×${g.n}` : g.name;
-      if (g.name === 'Warm-up') h.textContent = 'Warm-up · 3×3';
       list.appendChild(h);
       const grid = document.createElement('div'); grid.className = 'lvl-grid'; grid.dataset.name = g.name;
       list.appendChild(grid); lastName = g.name;
